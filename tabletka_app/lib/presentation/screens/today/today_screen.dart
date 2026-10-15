@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../providers/today_providers.dart';
 import 'widgets/intake_card.dart';
+import '../add_medication/add_medication_screen.dart';
+
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -14,6 +16,18 @@ class TodayScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppTheme.background,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const AddMedicationScreen(),
+            ),
+          );
+        },
+        backgroundColor: AppTheme.accentBlue,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
