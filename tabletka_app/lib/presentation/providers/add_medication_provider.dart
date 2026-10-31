@@ -46,16 +46,27 @@ Future<int> addMedicationWithSchedule({
   );
   final schedId = await schedRepo.add(schedule);
 
-  // 3. Генерируем приёмы на сегодня
+  // 3. Генерируем приёмы на весь период курса
   final savedSchedule = schedule.copyWith(id: schedId);
-  final intakes = generateIntakesForDate(
-    schedule: savedSchedule,
-    date: DateTime.now(),
-    scheduleStartDate: startDate,
-  );
 
-  for (final intake in intakes) {
-    await intakeRepo.add(intake);
+  // Определяем границы генерации
+  final start = DateTime(startDate.year, startDate.month, startDate.day);
+  // Если дата окончания не указана, генерируем на 30 дней вперед (чтобы не зависло)
+  final end = endDate != null
+      ? DateTime(endDate.year, endDate.month, endDate.day)
+      : start.add(const Duration(days: 30));
+
+  // Идем по дням от начала до конца
+  for (var day = start; day.isBefore(end.add(const Duration(days: 1))); day = day.add(const Duration(days: 1))) {
+    final intakesForDay = generateIntakesForDate(
+      schedule: savedSchedule,
+      date: day,
+      scheduleStartDate: startDate,
+    );
+
+    for (final intake in intakesForDay) {
+      await intakeRepo.add(intake);
+    }
   }
 
   return medId;

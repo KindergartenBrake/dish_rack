@@ -75,6 +75,28 @@ class IntakeRepositoryImpl implements IntakeRepository {
     );
   }
 
+  @override
+  Future<List<domain.Intake>> getByDateRange(DateTime start, DateTime end) async {
+    final rows = await (_db.select(_db.intakes)
+      ..where((t) =>
+      t.plannedAt.isBiggerOrEqualValue(start) &
+      t.plannedAt.isSmallerThanValue(end))
+      ..orderBy([(t) => OrderingTerm(expression: t.plannedAt)]))
+        .get();
+
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<void> markPending(int intakeId) async {
+    await (_db.update(_db.intakes)..where((t) => t.id.equals(intakeId))).write(
+      const db.IntakesCompanion(
+        status: Value(domain_enums.IntakeStatus.pending),
+        takenAt: Value(null), // Очищаем время приёма
+      ),
+    );
+  }
+
   // ─── Маппинг ──────────────────────────────────────────────
 
   domain.Intake _toDomain(db.Intake row) {
@@ -98,4 +120,6 @@ class IntakeRepositoryImpl implements IntakeRepository {
       status: Value(i.status),
     );
   }
+
+
 }

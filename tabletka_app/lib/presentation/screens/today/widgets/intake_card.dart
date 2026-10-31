@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/entities/enums.dart';
-import '../../../../presentation/providers/repository_providers.dart';
-import '../../../../presentation/providers/today_providers.dart';
+import '../../../providers/repository_providers.dart';
+import '../../../providers/today_providers.dart';
+import '../../../providers/calendar_providers.dart';
 
 class IntakeCard extends ConsumerWidget {
   final TodayIntake item;
@@ -71,17 +72,20 @@ class IntakeCard extends ConsumerWidget {
   Widget _buildStatusOrButton(BuildContext context, WidgetRef ref) {
     switch (item.status) {
       case IntakeStatus.taken:
-        return _StatusBadge(
-          text: 'Принято',
-          color: AppTheme.statusTaken,
+        return GestureDetector(
+          onTap: () => _showUndoDialog(context, ref),
+          child: const _StatusBadge(
+            text: 'Принято',
+            color: AppTheme.statusTaken,
+          ),
         );
       case IntakeStatus.skipped:
-        return _StatusBadge(
+        return const _StatusBadge(
           text: 'Пропущено',
           color: AppTheme.statusSkipped,
         );
       case IntakeStatus.postponed:
-        return _StatusBadge(
+        return const _StatusBadge(
           text: 'Отложено',
           color: AppTheme.statusPostponed,
         );
@@ -90,7 +94,27 @@ class IntakeCard extends ConsumerWidget {
           onPressed: () async {
             final repo = ref.read(intakeRepositoryProvider);
             await repo.markTaken(item.intake.id!, DateTime.now());
+
+            // Обновляем данные
             ref.invalidate(todayIntakesProvider);
+            ref.invalidate(monthIntakesProvider);
+
+            // Показываем SnackBar с возможностью отмены
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Лекарство отмечено как принятое'),
+                  action: SnackBarAction(
+                    label: 'Отменить',
+                    onPressed: () async {
+                      await repo.markPending(item.intake.id!);
+                      ref.invalidate(todayIntakesProvider);
+                      ref.invalidate(monthIntakesProvider);
+                    },
+                  ),
+                ),
+              );
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.statusTaken,
@@ -102,6 +126,34 @@ class IntakeCard extends ConsumerWidget {
           ),
           child: const Text('Принял', style: TextStyle(fontSize: 14)),
         );
+    }
+  }
+
+  // Диалоговое окно для отмены случайного нажатия
+  Future<void> _showUndoDialog(BuildContext context, WidgetRef ref) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Отменить приём?'),
+        content: const Text('Вернуть статус в «Ожидается»?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Нет'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Да, отменить'),
+          ),
+        ],
+      ),
+    );
+
+    if (ok == true) {
+      final repo = ref.read(intakeRepositoryProvider);
+      await repo.markPending(item.intake.id!);
+      ref.invalidate(todayIntakesProvider);
+      ref.invalidate(monthIntakesProvider);
     }
   }
 

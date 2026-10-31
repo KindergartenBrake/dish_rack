@@ -5,6 +5,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/enums.dart';
 import '../../providers/add_medication_provider.dart';
 import '../../providers/today_providers.dart';
+import '../../providers/calendar_providers.dart';
+import '../../providers/medications_providers.dart';
 
 class AddMedicationScreen extends ConsumerStatefulWidget {
   const AddMedicationScreen({super.key});
@@ -72,6 +74,8 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
       );
 
       ref.invalidate(todayIntakesProvider);
+      ref.invalidate(monthIntakesProvider); // Сброс кэша календаря
+      ref.invalidate(medicationsProvider);  // Сброс кэша списка лекарств
 
       if (mounted) {
         Navigator.of(context).pop();

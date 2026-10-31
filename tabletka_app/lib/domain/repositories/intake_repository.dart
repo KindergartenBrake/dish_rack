@@ -8,4 +8,6 @@ abstract class IntakeRepository {
   Future<void> markTaken(int intakeId, DateTime takenAt);
   Future<void> markSkipped(int intakeId);
   Future<void> markPostponed(int intakeId, Duration postponeBy);
+  Future<List<Intake>> getByDateRange(DateTime start, DateTime end);
+  Future<void> markPending(int intakeId);
 }
