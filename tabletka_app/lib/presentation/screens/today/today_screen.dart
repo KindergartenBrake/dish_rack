@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../../core/theme/app_theme.dart';
+import '../../../core/services/settings_service.dart';
+import '../../providers/settings_providers.dart';
 import '../../providers/today_providers.dart';
 import 'widgets/intake_card.dart';
 import '../add_medication/add_medication_screen.dart';
-
 
 class TodayScreen extends ConsumerWidget {
   const TodayScreen({super.key});
@@ -13,6 +13,7 @@ class TodayScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final todayAsync = ref.watch(todayIntakesProvider);
+    final nameAsync = ref.watch(userNameProvider);
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -36,19 +37,29 @@ class TodayScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 16),
 
-              // Приветствие
               Row(
                 children: [
                   CircleAvatar(
                     radius: 26,
-                    backgroundColor: AppTheme.accentBlue.withValues(alpha: 0.15),
-                    child: const Icon(Icons.person, color: AppTheme.accentBlue),
+                    backgroundColor:
+                        AppTheme.accentBlue.withValues(alpha: 0.15),
+                    child: const Icon(
+                      Icons.person,
+                      color: AppTheme.accentBlue,
+                    ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Доброе утро!',
-                      style: TextStyle(fontSize: 18, color: Colors.black54),
+                  Expanded(
+                    child: nameAsync.when(
+                      data: (name) => Text(
+                        'Доброе утро, $name!',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      loading: () => const Text('Доброе утро!'),
+                      error: (_, __) => const Text('Доброе утро!'),
                     ),
                   ),
                 ],
@@ -56,7 +67,6 @@ class TodayScreen extends ConsumerWidget {
 
               const SizedBox(height: 16),
 
-              // Дата
               Text(
                 _formatDate(DateTime.now()),
                 style: Theme.of(context).textTheme.headlineMedium,
@@ -64,7 +74,6 @@ class TodayScreen extends ConsumerWidget {
 
               const SizedBox(height: 16),
 
-              // Список приёмов
               Expanded(
                 child: todayAsync.when(
                   data: (items) {
@@ -72,19 +81,29 @@ class TodayScreen extends ConsumerWidget {
                       return const Center(
                         child: Text(
                           'На сегодня приёмов нет',
-                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
                         ),
                       );
                     }
+
                     return ListView.separated(
                       padding: const EdgeInsets.only(bottom: 16),
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => IntakeCard(item: items[i]),
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: 10),
+                      itemBuilder: (_, i) =>
+                          IntakeCard(item: items[i]),
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (e, _) => Center(child: Text('Ошибка: $e')),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  error: (e, _) => Center(
+                    child: Text('Ошибка: $e'),
+                  ),
                 ),
               ),
             ],
@@ -96,16 +115,18 @@ class TodayScreen extends ConsumerWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
+      'января', 'февраля', 'марта', 'апреля',
+      'мая', 'июня', 'июля', 'августа',
+      'сентября', 'октября', 'ноября', 'декабря',
     ];
+
     const weekdays = [
-      'Понедельник', 'Вторник', 'Среда', 'Четверг',
-      'Пятница', 'Суббота', 'Воскресенье',
+      'Понедельник', 'Вторник', 'Среда',
+      'Четверг', 'Пятница', 'Суббота',
+      'Воскресенье',
     ];
-    final wd = weekdays[date.weekday - 1];
-    final d = date.day;
-    final m = months[date.month - 1];
-    return '$wd, $d $m';
+
+    return '${weekdays[date.weekday - 1]}, '
+        '${date.day} ${months[date.month - 1]}';
   }
 }

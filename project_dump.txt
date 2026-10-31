@@ -1,0 +1,5232 @@
+﻿
+=== FILE: pubspec.yaml ===
+name: tabletka_app
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # РќР°РІРёРіР°С†РёСЏ
+  go_router: ^14.2.0
+
+  # Р›РѕРєР°Р»СЊРЅР°СЏ Р‘Р”
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.24
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+  # РЈРІРµРґРѕРјР»РµРЅРёСЏ
+  flutter_local_notifications: ^17.2.1
+  timezone: ^0.9.4
+
+  # РљР°РјРµСЂР° / РіР°Р»РµСЂРµСЏ
+  image_picker: ^1.1.2
+
+  # РЈС‚РёР»РёС‚С‹
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  drift_dev: ^2.18.0
+  build_runner: ^2.4.11
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
+
+
+=== FILE: analysis_options.yaml ===
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+#
+# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
+# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
+# invoked from the command line by running `flutter analyze`.
+
+# The following line activates a set of recommended lints for Flutter apps,
+# packages, and plugins designed to encourage good coding practices.
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+
+linter:
+  # The lint rules applied to this project can be customized in the
+  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
+  # included above or to enable additional rules. A list of all available lints
+  # and their documentation is published at https://dart.dev/lints.
+  #
+  # Instead of disabling a lint rule for the entire project in the
+  # section below, it can also be suppressed for a single line of code
+  # or a specific dart file by using the `// ignore: name_of_lint` and
+  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
+  # producing the lint.
+  rules:
+    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
+    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
+
+
+=== FILE: lib/core/theme/app_theme.dart ===
+import 'package:flutter/material.dart';
+
+/// РўРµРјР° РїСЂРёР»РѕР¶РµРЅРёСЏ В«РўР°Р±Р»РµС‚РѕС‡РЅРёС†Р°В».
+///
+/// Р¦РІРµС‚Р° Рё СЂР°Р·РјРµСЂС‹ РїРѕРґРѕР±СЂР°РЅС‹ РїРѕРґ РјР°РєРµС‚: РєСЂСѓРїРЅС‹Рµ С€СЂРёС„С‚С‹,
+/// РєРѕРЅС‚СЂР°СЃС‚РЅС‹Рµ СЃС‚Р°С‚СѓСЃС‹, РјСЏРіРєРёР№ СЃРµСЂС‹Р№ С„РѕРЅ.
+class AppTheme {
+  AppTheme._();
+
+  // в”Ђв”Ђв”Ђ Р¦РІРµС‚Р° в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  static const Color background = Color(0xFFF5F5F7);
+  static const Color cardWhite = Colors.white;
+
+  static const Color accentBlue = Color(0xFF3B82F6);
+
+  static const Color statusTaken = Color(0xFF10B981);   // Р·РµР»С‘РЅС‹Р№
+  static const Color statusPending = Color(0xFF9CA3AF); // СЃРµСЂС‹Р№
+  static const Color statusSkipped = Color(0xFFEF4444); // РєСЂР°СЃРЅС‹Р№
+  static const Color statusPostponed = Color(0xFFF59E0B); // РѕСЂР°РЅР¶РµРІС‹Р№
+
+  // в”Ђв”Ђв”Ђ РўРµРјР° в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  static ThemeData get light {
+    final base = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: accentBlue,
+        brightness: Brightness.light,
+      ),
+      scaffoldBackgroundColor: background,
+    );
+
+    return base.copyWith(
+      textTheme: base.textTheme.copyWith(
+        headlineMedium: const TextStyle(
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+        titleLarge: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+        bodyLarge: const TextStyle(
+          fontSize: 18,
+          color: Colors.black87,
+        ),
+        bodyMedium: const TextStyle(
+          fontSize: 16,
+          color: Colors.black54,
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: background,
+        elevation: 0,
+        centerTitle: false,
+        foregroundColor: Colors.black87,
+        titleTextStyle: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+}
+
+=== FILE: lib/data/local/tables/intakes_table.dart ===
+import 'package:drift/drift.dart';
+import '../../../../domain/entities/enums.dart';
+import 'medications_table.dart';
+import 'schedules_table.dart';
+
+/// РўР°Р±Р»РёС†Р° В«Р¤Р°РєС‚С‹ РїСЂРёС‘РјР°В».
+class Intakes extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get scheduleId => integer().references(Schedules, #id)();
+  IntColumn get medicationId => integer().references(Medications, #id)();
+  DateTimeColumn get plannedAt => dateTime()();
+  DateTimeColumn get takenAt => dateTime().nullable()();
+  IntColumn get status => intEnum<IntakeStatus>()();
+}
+
+=== FILE: lib/data/local/tables/medications_table.dart ===
+import 'package:drift/drift.dart';
+import '../../../domain/entities/enums.dart';
+
+/// РўР°Р±Р»РёС†Р° В«Р›РµРєР°СЂСЃС‚РІР°В».
+class Medications extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().withLength(min: 1, max: 200)();
+  TextColumn get dosage => text().nullable()();
+  IntColumn get form => intEnum<MedicationForm>()();
+  TextColumn get photoPath => text().nullable()();
+  DateTimeColumn get startDate => dateTime()();
+  DateTimeColumn get endDate => dateTime().nullable()();
+  TextColumn get notes => text().nullable()();
+}
+
+=== FILE: lib/data/local/tables/schedules_table.dart ===
+import 'package:drift/drift.dart';
+import '../../../../domain/entities/enums.dart';
+import 'medications_table.dart';
+
+/// РўР°Р±Р»РёС†Р° В«Р Р°СЃРїРёСЃР°РЅРёСЏ РїСЂРёС‘РјР°В».
+class Schedules extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get medicationId => integer().references(Medications, #id)();
+
+  /// Р’СЂРµРјРµРЅР° С…СЂР°РЅРёРј СЃС‚СЂРѕРєРѕР№: "480,840,1200" (РјРёРЅСѓС‚С‹ РѕС‚ РЅР°С‡Р°Р»Р° СЃСѓС‚РѕРє).
+  TextColumn get timesInMinutes => text()();
+
+  IntColumn get periodicity => intEnum<SchedulePeriodicity>()();
+
+  /// Р”РЅРё РЅРµРґРµР»Рё: "1,3,5" (1=РџРЅ ... 7=Р’СЃ). РўРѕР»СЊРєРѕ РґР»СЏ specificDaysOfWeek.
+  TextColumn get weekdays => text().nullable()();
+
+  BoolColumn get isActive => boolean().withDefault(const Constant(true))();
+}
+
+=== FILE: lib/data/local/database.dart ===
+import 'dart:io';
+
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
+import 'tables/intakes_table.dart';
+import 'tables/medications_table.dart';
+import 'tables/schedules_table.dart';
+
+import '../../domain/entities/enums.dart';
+
+part 'database.g.dart';
+
+/// Р“Р»Р°РІРЅР°СЏ Р±Р°Р·Р° РґР°РЅРЅС‹С… РїСЂРёР»РѕР¶РµРЅРёСЏ.
+@DriftDatabase(tables: [Medications, Schedules, Intakes])
+class AppDatabase extends _$AppDatabase {
+  AppDatabase() : super(_openConnection());
+
+  /// РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РґР»СЏ С‚РµСЃС‚РѕРІ вЂ” РїСЂРёРЅРёРјР°РµС‚ executor РЅР°РїСЂСЏРјСѓСЋ.
+  AppDatabase.forTesting(super.executor);
+
+  @override
+  int get schemaVersion => 1;
+}
+
+/// Р›РµРЅРёРІРѕРµ РѕС‚РєСЂС‹С‚РёРµ СЃРѕРµРґРёРЅРµРЅРёСЏ: С„Р°Р№Р» СЃРѕР·РґР°СЃС‚СЃСЏ С‚РѕР»СЊРєРѕ РїСЂРё РїРµСЂРІРѕРј РѕР±СЂР°С‰РµРЅРёРё.
+LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dir.path, 'tabletka.sqlite'));
+    return NativeDatabase.createInBackground(file);
+  });
+}
+
+=== FILE: lib/data/local/database.g.dart ===
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'database.dart';
+
+// ignore_for_file: type=lint
+class $MedicationsTable extends Medications
+    with TableInfo<$MedicationsTable, Medication> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $MedicationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 200,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dosageMeta = const VerificationMeta('dosage');
+  @override
+  late final GeneratedColumn<String> dosage = GeneratedColumn<String>(
+    'dosage',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<MedicationForm, int> form =
+      GeneratedColumn<int>(
+        'form',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<MedicationForm>($MedicationsTable.$converterform);
+  static const VerificationMeta _photoPathMeta = const VerificationMeta(
+    'photoPath',
+  );
+  @override
+  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
+    'photo_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
+    'end_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    dosage,
+    form,
+    photoPath,
+    startDate,
+    endDate,
+    notes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'medications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Medication> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('dosage')) {
+      context.handle(
+        _dosageMeta,
+        dosage.isAcceptableOrUnknown(data['dosage']!, _dosageMeta),
+      );
+    }
+    if (data.containsKey('photo_path')) {
+      context.handle(
+        _photoPathMeta,
+        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
+      );
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Medication map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Medication(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      dosage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dosage'],
+      ),
+      form: $MedicationsTable.$converterform.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}form'],
+        )!,
+      ),
+      photoPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}photo_path'],
+      ),
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_date'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+    );
+  }
+
+  @override
+  $MedicationsTable createAlias(String alias) {
+    return $MedicationsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<MedicationForm, int, int> $converterform =
+      const EnumIndexConverter<MedicationForm>(MedicationForm.values);
+}
+
+class Medication extends DataClass implements Insertable<Medication> {
+  final int id;
+  final String name;
+  final String? dosage;
+  final MedicationForm form;
+  final String? photoPath;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final String? notes;
+  const Medication({
+    required this.id,
+    required this.name,
+    this.dosage,
+    required this.form,
+    this.photoPath,
+    required this.startDate,
+    this.endDate,
+    this.notes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || dosage != null) {
+      map['dosage'] = Variable<String>(dosage);
+    }
+    {
+      map['form'] = Variable<int>($MedicationsTable.$converterform.toSql(form));
+    }
+    if (!nullToAbsent || photoPath != null) {
+      map['photo_path'] = Variable<String>(photoPath);
+    }
+    map['start_date'] = Variable<DateTime>(startDate);
+    if (!nullToAbsent || endDate != null) {
+      map['end_date'] = Variable<DateTime>(endDate);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    return map;
+  }
+
+  MedicationsCompanion toCompanion(bool nullToAbsent) {
+    return MedicationsCompanion(
+      id: Value(id),
+      name: Value(name),
+      dosage: dosage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dosage),
+      form: Value(form),
+      photoPath: photoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(photoPath),
+      startDate: Value(startDate),
+      endDate: endDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(endDate),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+    );
+  }
+
+  factory Medication.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Medication(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      dosage: serializer.fromJson<String?>(json['dosage']),
+      form: $MedicationsTable.$converterform.fromJson(
+        serializer.fromJson<int>(json['form']),
+      ),
+      photoPath: serializer.fromJson<String?>(json['photoPath']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime?>(json['endDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'dosage': serializer.toJson<String?>(dosage),
+      'form': serializer.toJson<int>(
+        $MedicationsTable.$converterform.toJson(form),
+      ),
+      'photoPath': serializer.toJson<String?>(photoPath),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime?>(endDate),
+      'notes': serializer.toJson<String?>(notes),
+    };
+  }
+
+  Medication copyWith({
+    int? id,
+    String? name,
+    Value<String?> dosage = const Value.absent(),
+    MedicationForm? form,
+    Value<String?> photoPath = const Value.absent(),
+    DateTime? startDate,
+    Value<DateTime?> endDate = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+  }) => Medication(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    dosage: dosage.present ? dosage.value : this.dosage,
+    form: form ?? this.form,
+    photoPath: photoPath.present ? photoPath.value : this.photoPath,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate.present ? endDate.value : this.endDate,
+    notes: notes.present ? notes.value : this.notes,
+  );
+  Medication copyWithCompanion(MedicationsCompanion data) {
+    return Medication(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      dosage: data.dosage.present ? data.dosage.value : this.dosage,
+      form: data.form.present ? data.form.value : this.form,
+      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Medication(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('dosage: $dosage, ')
+          ..write('form: $form, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, name, dosage, form, photoPath, startDate, endDate, notes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Medication &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.dosage == this.dosage &&
+          other.form == this.form &&
+          other.photoPath == this.photoPath &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.notes == this.notes);
+}
+
+class MedicationsCompanion extends UpdateCompanion<Medication> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<String?> dosage;
+  final Value<MedicationForm> form;
+  final Value<String?> photoPath;
+  final Value<DateTime> startDate;
+  final Value<DateTime?> endDate;
+  final Value<String?> notes;
+  const MedicationsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.dosage = const Value.absent(),
+    this.form = const Value.absent(),
+    this.photoPath = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.notes = const Value.absent(),
+  });
+  MedicationsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.dosage = const Value.absent(),
+    required MedicationForm form,
+    this.photoPath = const Value.absent(),
+    required DateTime startDate,
+    this.endDate = const Value.absent(),
+    this.notes = const Value.absent(),
+  }) : name = Value(name),
+       form = Value(form),
+       startDate = Value(startDate);
+  static Insertable<Medication> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? dosage,
+    Expression<int>? form,
+    Expression<String>? photoPath,
+    Expression<DateTime>? startDate,
+    Expression<DateTime>? endDate,
+    Expression<String>? notes,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (dosage != null) 'dosage': dosage,
+      if (form != null) 'form': form,
+      if (photoPath != null) 'photo_path': photoPath,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (notes != null) 'notes': notes,
+    });
+  }
+
+  MedicationsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<String?>? dosage,
+    Value<MedicationForm>? form,
+    Value<String?>? photoPath,
+    Value<DateTime>? startDate,
+    Value<DateTime?>? endDate,
+    Value<String?>? notes,
+  }) {
+    return MedicationsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      dosage: dosage ?? this.dosage,
+      form: form ?? this.form,
+      photoPath: photoPath ?? this.photoPath,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (dosage.present) {
+      map['dosage'] = Variable<String>(dosage.value);
+    }
+    if (form.present) {
+      map['form'] = Variable<int>(
+        $MedicationsTable.$converterform.toSql(form.value),
+      );
+    }
+    if (photoPath.present) {
+      map['photo_path'] = Variable<String>(photoPath.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<DateTime>(endDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('MedicationsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('dosage: $dosage, ')
+          ..write('form: $form, ')
+          ..write('photoPath: $photoPath, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SchedulesTable extends Schedules
+    with TableInfo<$SchedulesTable, Schedule> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SchedulesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _medicationIdMeta = const VerificationMeta(
+    'medicationId',
+  );
+  @override
+  late final GeneratedColumn<int> medicationId = GeneratedColumn<int>(
+    'medication_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medications (id)',
+    ),
+  );
+  static const VerificationMeta _timesInMinutesMeta = const VerificationMeta(
+    'timesInMinutes',
+  );
+  @override
+  late final GeneratedColumn<String> timesInMinutes = GeneratedColumn<String>(
+    'times_in_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SchedulePeriodicity, int>
+  periodicity = GeneratedColumn<int>(
+    'periodicity',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  ).withConverter<SchedulePeriodicity>($SchedulesTable.$converterperiodicity);
+  static const VerificationMeta _weekdaysMeta = const VerificationMeta(
+    'weekdays',
+  );
+  @override
+  late final GeneratedColumn<String> weekdays = GeneratedColumn<String>(
+    'weekdays',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    medicationId,
+    timesInMinutes,
+    periodicity,
+    weekdays,
+    isActive,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'schedules';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Schedule> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('medication_id')) {
+      context.handle(
+        _medicationIdMeta,
+        medicationId.isAcceptableOrUnknown(
+          data['medication_id']!,
+          _medicationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_medicationIdMeta);
+    }
+    if (data.containsKey('times_in_minutes')) {
+      context.handle(
+        _timesInMinutesMeta,
+        timesInMinutes.isAcceptableOrUnknown(
+          data['times_in_minutes']!,
+          _timesInMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_timesInMinutesMeta);
+    }
+    if (data.containsKey('weekdays')) {
+      context.handle(
+        _weekdaysMeta,
+        weekdays.isAcceptableOrUnknown(data['weekdays']!, _weekdaysMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Schedule map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Schedule(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      medicationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medication_id'],
+      )!,
+      timesInMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}times_in_minutes'],
+      )!,
+      periodicity: $SchedulesTable.$converterperiodicity.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}periodicity'],
+        )!,
+      ),
+      weekdays: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}weekdays'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+    );
+  }
+
+  @override
+  $SchedulesTable createAlias(String alias) {
+    return $SchedulesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SchedulePeriodicity, int, int>
+  $converterperiodicity = const EnumIndexConverter<SchedulePeriodicity>(
+    SchedulePeriodicity.values,
+  );
+}
+
+class Schedule extends DataClass implements Insertable<Schedule> {
+  final int id;
+  final int medicationId;
+
+  /// Р’СЂРµРјРµРЅР° С…СЂР°РЅРёРј СЃС‚СЂРѕРєРѕР№: "480,840,1200" (РјРёРЅСѓС‚С‹ РѕС‚ РЅР°С‡Р°Р»Р° СЃСѓС‚РѕРє).
+  final String timesInMinutes;
+  final SchedulePeriodicity periodicity;
+
+  /// Р”РЅРё РЅРµРґРµР»Рё: "1,3,5" (1=РџРЅ ... 7=Р’СЃ). РўРѕР»СЊРєРѕ РґР»СЏ specificDaysOfWeek.
+  final String? weekdays;
+  final bool isActive;
+  const Schedule({
+    required this.id,
+    required this.medicationId,
+    required this.timesInMinutes,
+    required this.periodicity,
+    this.weekdays,
+    required this.isActive,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['medication_id'] = Variable<int>(medicationId);
+    map['times_in_minutes'] = Variable<String>(timesInMinutes);
+    {
+      map['periodicity'] = Variable<int>(
+        $SchedulesTable.$converterperiodicity.toSql(periodicity),
+      );
+    }
+    if (!nullToAbsent || weekdays != null) {
+      map['weekdays'] = Variable<String>(weekdays);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    return map;
+  }
+
+  SchedulesCompanion toCompanion(bool nullToAbsent) {
+    return SchedulesCompanion(
+      id: Value(id),
+      medicationId: Value(medicationId),
+      timesInMinutes: Value(timesInMinutes),
+      periodicity: Value(periodicity),
+      weekdays: weekdays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(weekdays),
+      isActive: Value(isActive),
+    );
+  }
+
+  factory Schedule.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Schedule(
+      id: serializer.fromJson<int>(json['id']),
+      medicationId: serializer.fromJson<int>(json['medicationId']),
+      timesInMinutes: serializer.fromJson<String>(json['timesInMinutes']),
+      periodicity: $SchedulesTable.$converterperiodicity.fromJson(
+        serializer.fromJson<int>(json['periodicity']),
+      ),
+      weekdays: serializer.fromJson<String?>(json['weekdays']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'medicationId': serializer.toJson<int>(medicationId),
+      'timesInMinutes': serializer.toJson<String>(timesInMinutes),
+      'periodicity': serializer.toJson<int>(
+        $SchedulesTable.$converterperiodicity.toJson(periodicity),
+      ),
+      'weekdays': serializer.toJson<String?>(weekdays),
+      'isActive': serializer.toJson<bool>(isActive),
+    };
+  }
+
+  Schedule copyWith({
+    int? id,
+    int? medicationId,
+    String? timesInMinutes,
+    SchedulePeriodicity? periodicity,
+    Value<String?> weekdays = const Value.absent(),
+    bool? isActive,
+  }) => Schedule(
+    id: id ?? this.id,
+    medicationId: medicationId ?? this.medicationId,
+    timesInMinutes: timesInMinutes ?? this.timesInMinutes,
+    periodicity: periodicity ?? this.periodicity,
+    weekdays: weekdays.present ? weekdays.value : this.weekdays,
+    isActive: isActive ?? this.isActive,
+  );
+  Schedule copyWithCompanion(SchedulesCompanion data) {
+    return Schedule(
+      id: data.id.present ? data.id.value : this.id,
+      medicationId: data.medicationId.present
+          ? data.medicationId.value
+          : this.medicationId,
+      timesInMinutes: data.timesInMinutes.present
+          ? data.timesInMinutes.value
+          : this.timesInMinutes,
+      periodicity: data.periodicity.present
+          ? data.periodicity.value
+          : this.periodicity,
+      weekdays: data.weekdays.present ? data.weekdays.value : this.weekdays,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Schedule(')
+          ..write('id: $id, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('timesInMinutes: $timesInMinutes, ')
+          ..write('periodicity: $periodicity, ')
+          ..write('weekdays: $weekdays, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    medicationId,
+    timesInMinutes,
+    periodicity,
+    weekdays,
+    isActive,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Schedule &&
+          other.id == this.id &&
+          other.medicationId == this.medicationId &&
+          other.timesInMinutes == this.timesInMinutes &&
+          other.periodicity == this.periodicity &&
+          other.weekdays == this.weekdays &&
+          other.isActive == this.isActive);
+}
+
+class SchedulesCompanion extends UpdateCompanion<Schedule> {
+  final Value<int> id;
+  final Value<int> medicationId;
+  final Value<String> timesInMinutes;
+  final Value<SchedulePeriodicity> periodicity;
+  final Value<String?> weekdays;
+  final Value<bool> isActive;
+  const SchedulesCompanion({
+    this.id = const Value.absent(),
+    this.medicationId = const Value.absent(),
+    this.timesInMinutes = const Value.absent(),
+    this.periodicity = const Value.absent(),
+    this.weekdays = const Value.absent(),
+    this.isActive = const Value.absent(),
+  });
+  SchedulesCompanion.insert({
+    this.id = const Value.absent(),
+    required int medicationId,
+    required String timesInMinutes,
+    required SchedulePeriodicity periodicity,
+    this.weekdays = const Value.absent(),
+    this.isActive = const Value.absent(),
+  }) : medicationId = Value(medicationId),
+       timesInMinutes = Value(timesInMinutes),
+       periodicity = Value(periodicity);
+  static Insertable<Schedule> custom({
+    Expression<int>? id,
+    Expression<int>? medicationId,
+    Expression<String>? timesInMinutes,
+    Expression<int>? periodicity,
+    Expression<String>? weekdays,
+    Expression<bool>? isActive,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (medicationId != null) 'medication_id': medicationId,
+      if (timesInMinutes != null) 'times_in_minutes': timesInMinutes,
+      if (periodicity != null) 'periodicity': periodicity,
+      if (weekdays != null) 'weekdays': weekdays,
+      if (isActive != null) 'is_active': isActive,
+    });
+  }
+
+  SchedulesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? medicationId,
+    Value<String>? timesInMinutes,
+    Value<SchedulePeriodicity>? periodicity,
+    Value<String?>? weekdays,
+    Value<bool>? isActive,
+  }) {
+    return SchedulesCompanion(
+      id: id ?? this.id,
+      medicationId: medicationId ?? this.medicationId,
+      timesInMinutes: timesInMinutes ?? this.timesInMinutes,
+      periodicity: periodicity ?? this.periodicity,
+      weekdays: weekdays ?? this.weekdays,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (medicationId.present) {
+      map['medication_id'] = Variable<int>(medicationId.value);
+    }
+    if (timesInMinutes.present) {
+      map['times_in_minutes'] = Variable<String>(timesInMinutes.value);
+    }
+    if (periodicity.present) {
+      map['periodicity'] = Variable<int>(
+        $SchedulesTable.$converterperiodicity.toSql(periodicity.value),
+      );
+    }
+    if (weekdays.present) {
+      map['weekdays'] = Variable<String>(weekdays.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SchedulesCompanion(')
+          ..write('id: $id, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('timesInMinutes: $timesInMinutes, ')
+          ..write('periodicity: $periodicity, ')
+          ..write('weekdays: $weekdays, ')
+          ..write('isActive: $isActive')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $IntakesTable extends Intakes with TableInfo<$IntakesTable, Intake> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $IntakesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _scheduleIdMeta = const VerificationMeta(
+    'scheduleId',
+  );
+  @override
+  late final GeneratedColumn<int> scheduleId = GeneratedColumn<int>(
+    'schedule_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES schedules (id)',
+    ),
+  );
+  static const VerificationMeta _medicationIdMeta = const VerificationMeta(
+    'medicationId',
+  );
+  @override
+  late final GeneratedColumn<int> medicationId = GeneratedColumn<int>(
+    'medication_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES medications (id)',
+    ),
+  );
+  static const VerificationMeta _plannedAtMeta = const VerificationMeta(
+    'plannedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> plannedAt = GeneratedColumn<DateTime>(
+    'planned_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _takenAtMeta = const VerificationMeta(
+    'takenAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> takenAt = GeneratedColumn<DateTime>(
+    'taken_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<IntakeStatus, int> status =
+      GeneratedColumn<int>(
+        'status',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<IntakeStatus>($IntakesTable.$converterstatus);
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    scheduleId,
+    medicationId,
+    plannedAt,
+    takenAt,
+    status,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'intakes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Intake> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('schedule_id')) {
+      context.handle(
+        _scheduleIdMeta,
+        scheduleId.isAcceptableOrUnknown(data['schedule_id']!, _scheduleIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_scheduleIdMeta);
+    }
+    if (data.containsKey('medication_id')) {
+      context.handle(
+        _medicationIdMeta,
+        medicationId.isAcceptableOrUnknown(
+          data['medication_id']!,
+          _medicationIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_medicationIdMeta);
+    }
+    if (data.containsKey('planned_at')) {
+      context.handle(
+        _plannedAtMeta,
+        plannedAt.isAcceptableOrUnknown(data['planned_at']!, _plannedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_plannedAtMeta);
+    }
+    if (data.containsKey('taken_at')) {
+      context.handle(
+        _takenAtMeta,
+        takenAt.isAcceptableOrUnknown(data['taken_at']!, _takenAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Intake map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Intake(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      scheduleId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}schedule_id'],
+      )!,
+      medicationId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}medication_id'],
+      )!,
+      plannedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}planned_at'],
+      )!,
+      takenAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}taken_at'],
+      ),
+      status: $IntakesTable.$converterstatus.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}status'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $IntakesTable createAlias(String alias) {
+    return $IntakesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<IntakeStatus, int, int> $converterstatus =
+      const EnumIndexConverter<IntakeStatus>(IntakeStatus.values);
+}
+
+class Intake extends DataClass implements Insertable<Intake> {
+  final int id;
+  final int scheduleId;
+  final int medicationId;
+  final DateTime plannedAt;
+  final DateTime? takenAt;
+  final IntakeStatus status;
+  const Intake({
+    required this.id,
+    required this.scheduleId,
+    required this.medicationId,
+    required this.plannedAt,
+    this.takenAt,
+    required this.status,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['schedule_id'] = Variable<int>(scheduleId);
+    map['medication_id'] = Variable<int>(medicationId);
+    map['planned_at'] = Variable<DateTime>(plannedAt);
+    if (!nullToAbsent || takenAt != null) {
+      map['taken_at'] = Variable<DateTime>(takenAt);
+    }
+    {
+      map['status'] = Variable<int>(
+        $IntakesTable.$converterstatus.toSql(status),
+      );
+    }
+    return map;
+  }
+
+  IntakesCompanion toCompanion(bool nullToAbsent) {
+    return IntakesCompanion(
+      id: Value(id),
+      scheduleId: Value(scheduleId),
+      medicationId: Value(medicationId),
+      plannedAt: Value(plannedAt),
+      takenAt: takenAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(takenAt),
+      status: Value(status),
+    );
+  }
+
+  factory Intake.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Intake(
+      id: serializer.fromJson<int>(json['id']),
+      scheduleId: serializer.fromJson<int>(json['scheduleId']),
+      medicationId: serializer.fromJson<int>(json['medicationId']),
+      plannedAt: serializer.fromJson<DateTime>(json['plannedAt']),
+      takenAt: serializer.fromJson<DateTime?>(json['takenAt']),
+      status: $IntakesTable.$converterstatus.fromJson(
+        serializer.fromJson<int>(json['status']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'scheduleId': serializer.toJson<int>(scheduleId),
+      'medicationId': serializer.toJson<int>(medicationId),
+      'plannedAt': serializer.toJson<DateTime>(plannedAt),
+      'takenAt': serializer.toJson<DateTime?>(takenAt),
+      'status': serializer.toJson<int>(
+        $IntakesTable.$converterstatus.toJson(status),
+      ),
+    };
+  }
+
+  Intake copyWith({
+    int? id,
+    int? scheduleId,
+    int? medicationId,
+    DateTime? plannedAt,
+    Value<DateTime?> takenAt = const Value.absent(),
+    IntakeStatus? status,
+  }) => Intake(
+    id: id ?? this.id,
+    scheduleId: scheduleId ?? this.scheduleId,
+    medicationId: medicationId ?? this.medicationId,
+    plannedAt: plannedAt ?? this.plannedAt,
+    takenAt: takenAt.present ? takenAt.value : this.takenAt,
+    status: status ?? this.status,
+  );
+  Intake copyWithCompanion(IntakesCompanion data) {
+    return Intake(
+      id: data.id.present ? data.id.value : this.id,
+      scheduleId: data.scheduleId.present
+          ? data.scheduleId.value
+          : this.scheduleId,
+      medicationId: data.medicationId.present
+          ? data.medicationId.value
+          : this.medicationId,
+      plannedAt: data.plannedAt.present ? data.plannedAt.value : this.plannedAt,
+      takenAt: data.takenAt.present ? data.takenAt.value : this.takenAt,
+      status: data.status.present ? data.status.value : this.status,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Intake(')
+          ..write('id: $id, ')
+          ..write('scheduleId: $scheduleId, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('plannedAt: $plannedAt, ')
+          ..write('takenAt: $takenAt, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, scheduleId, medicationId, plannedAt, takenAt, status);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Intake &&
+          other.id == this.id &&
+          other.scheduleId == this.scheduleId &&
+          other.medicationId == this.medicationId &&
+          other.plannedAt == this.plannedAt &&
+          other.takenAt == this.takenAt &&
+          other.status == this.status);
+}
+
+class IntakesCompanion extends UpdateCompanion<Intake> {
+  final Value<int> id;
+  final Value<int> scheduleId;
+  final Value<int> medicationId;
+  final Value<DateTime> plannedAt;
+  final Value<DateTime?> takenAt;
+  final Value<IntakeStatus> status;
+  const IntakesCompanion({
+    this.id = const Value.absent(),
+    this.scheduleId = const Value.absent(),
+    this.medicationId = const Value.absent(),
+    this.plannedAt = const Value.absent(),
+    this.takenAt = const Value.absent(),
+    this.status = const Value.absent(),
+  });
+  IntakesCompanion.insert({
+    this.id = const Value.absent(),
+    required int scheduleId,
+    required int medicationId,
+    required DateTime plannedAt,
+    this.takenAt = const Value.absent(),
+    required IntakeStatus status,
+  }) : scheduleId = Value(scheduleId),
+       medicationId = Value(medicationId),
+       plannedAt = Value(plannedAt),
+       status = Value(status);
+  static Insertable<Intake> custom({
+    Expression<int>? id,
+    Expression<int>? scheduleId,
+    Expression<int>? medicationId,
+    Expression<DateTime>? plannedAt,
+    Expression<DateTime>? takenAt,
+    Expression<int>? status,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (scheduleId != null) 'schedule_id': scheduleId,
+      if (medicationId != null) 'medication_id': medicationId,
+      if (plannedAt != null) 'planned_at': plannedAt,
+      if (takenAt != null) 'taken_at': takenAt,
+      if (status != null) 'status': status,
+    });
+  }
+
+  IntakesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? scheduleId,
+    Value<int>? medicationId,
+    Value<DateTime>? plannedAt,
+    Value<DateTime?>? takenAt,
+    Value<IntakeStatus>? status,
+  }) {
+    return IntakesCompanion(
+      id: id ?? this.id,
+      scheduleId: scheduleId ?? this.scheduleId,
+      medicationId: medicationId ?? this.medicationId,
+      plannedAt: plannedAt ?? this.plannedAt,
+      takenAt: takenAt ?? this.takenAt,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (scheduleId.present) {
+      map['schedule_id'] = Variable<int>(scheduleId.value);
+    }
+    if (medicationId.present) {
+      map['medication_id'] = Variable<int>(medicationId.value);
+    }
+    if (plannedAt.present) {
+      map['planned_at'] = Variable<DateTime>(plannedAt.value);
+    }
+    if (takenAt.present) {
+      map['taken_at'] = Variable<DateTime>(takenAt.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<int>(
+        $IntakesTable.$converterstatus.toSql(status.value),
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('IntakesCompanion(')
+          ..write('id: $id, ')
+          ..write('scheduleId: $scheduleId, ')
+          ..write('medicationId: $medicationId, ')
+          ..write('plannedAt: $plannedAt, ')
+          ..write('takenAt: $takenAt, ')
+          ..write('status: $status')
+          ..write(')'))
+        .toString();
+  }
+}
+
+abstract class _$AppDatabase extends GeneratedDatabase {
+  _$AppDatabase(QueryExecutor e) : super(e);
+  $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $MedicationsTable medications = $MedicationsTable(this);
+  late final $SchedulesTable schedules = $SchedulesTable(this);
+  late final $IntakesTable intakes = $IntakesTable(this);
+  @override
+  Iterable<TableInfo<Table, Object?>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+  @override
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    medications,
+    schedules,
+    intakes,
+  ];
+}
+
+typedef $$MedicationsTableCreateCompanionBuilder =
+    MedicationsCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<String?> dosage,
+      required MedicationForm form,
+      Value<String?> photoPath,
+      required DateTime startDate,
+      Value<DateTime?> endDate,
+      Value<String?> notes,
+    });
+typedef $$MedicationsTableUpdateCompanionBuilder =
+    MedicationsCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<String?> dosage,
+      Value<MedicationForm> form,
+      Value<String?> photoPath,
+      Value<DateTime> startDate,
+      Value<DateTime?> endDate,
+      Value<String?> notes,
+    });
+
+final class $$MedicationsTableReferences
+    extends BaseReferences<_$AppDatabase, $MedicationsTable, Medication> {
+  $$MedicationsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$SchedulesTable, List<Schedule>>
+  _schedulesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.schedules,
+    aliasName: 'medications__id__schedules__medication_id',
+  );
+
+  $$SchedulesTableProcessedTableManager get schedulesRefs {
+    final manager = $$SchedulesTableTableManager(
+      $_db,
+      $_db.schedules,
+    ).filter((f) => f.medicationId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_schedulesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$IntakesTable, List<Intake>> _intakesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.intakes,
+    aliasName: 'medications__id__intakes__medication_id',
+  );
+
+  $$IntakesTableProcessedTableManager get intakesRefs {
+    final manager = $$IntakesTableTableManager(
+      $_db,
+      $_db.intakes,
+    ).filter((f) => f.medicationId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_intakesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$MedicationsTableFilterComposer
+    extends Composer<_$AppDatabase, $MedicationsTable> {
+  $$MedicationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dosage => $composableBuilder(
+    column: $table.dosage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<MedicationForm, MedicationForm, int>
+  get form => $composableBuilder(
+    column: $table.form,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> schedulesRefs(
+    Expression<bool> Function($$SchedulesTableFilterComposer f) f,
+  ) {
+    final $$SchedulesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.schedules,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SchedulesTableFilterComposer(
+            $db: $db,
+            $table: $db.schedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> intakesRefs(
+    Expression<bool> Function($$IntakesTableFilterComposer f) f,
+  ) {
+    final $$IntakesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.intakes,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IntakesTableFilterComposer(
+            $db: $db,
+            $table: $db.intakes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MedicationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $MedicationsTable> {
+  $$MedicationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dosage => $composableBuilder(
+    column: $table.dosage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get form => $composableBuilder(
+    column: $table.form,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get photoPath => $composableBuilder(
+    column: $table.photoPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$MedicationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $MedicationsTable> {
+  $$MedicationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get dosage =>
+      $composableBuilder(column: $table.dosage, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<MedicationForm, int> get form =>
+      $composableBuilder(column: $table.form, builder: (column) => column);
+
+  GeneratedColumn<String> get photoPath =>
+      $composableBuilder(column: $table.photoPath, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  Expression<T> schedulesRefs<T extends Object>(
+    Expression<T> Function($$SchedulesTableAnnotationComposer a) f,
+  ) {
+    final $$SchedulesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.schedules,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SchedulesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.schedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> intakesRefs<T extends Object>(
+    Expression<T> Function($$IntakesTableAnnotationComposer a) f,
+  ) {
+    final $$IntakesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.intakes,
+      getReferencedColumn: (t) => t.medicationId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IntakesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.intakes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$MedicationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $MedicationsTable,
+          Medication,
+          $$MedicationsTableFilterComposer,
+          $$MedicationsTableOrderingComposer,
+          $$MedicationsTableAnnotationComposer,
+          $$MedicationsTableCreateCompanionBuilder,
+          $$MedicationsTableUpdateCompanionBuilder,
+          (Medication, $$MedicationsTableReferences),
+          Medication,
+          PrefetchHooks Function({bool schedulesRefs, bool intakesRefs})
+        > {
+  $$MedicationsTableTableManager(_$AppDatabase db, $MedicationsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$MedicationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$MedicationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$MedicationsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> dosage = const Value.absent(),
+                Value<MedicationForm> form = const Value.absent(),
+                Value<String?> photoPath = const Value.absent(),
+                Value<DateTime> startDate = const Value.absent(),
+                Value<DateTime?> endDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+              }) => MedicationsCompanion(
+                id: id,
+                name: name,
+                dosage: dosage,
+                form: form,
+                photoPath: photoPath,
+                startDate: startDate,
+                endDate: endDate,
+                notes: notes,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<String?> dosage = const Value.absent(),
+                required MedicationForm form,
+                Value<String?> photoPath = const Value.absent(),
+                required DateTime startDate,
+                Value<DateTime?> endDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+              }) => MedicationsCompanion.insert(
+                id: id,
+                name: name,
+                dosage: dosage,
+                form: form,
+                photoPath: photoPath,
+                startDate: startDate,
+                endDate: endDate,
+                notes: notes,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$MedicationsTable, Medication>(table),
+                  $$MedicationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({schedulesRefs = false, intakesRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (schedulesRefs) db.schedules,
+                    if (intakesRefs) db.intakes,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (schedulesRefs)
+                        await $_getPrefetchedData<
+                          Medication,
+                          $MedicationsTable,
+                          Schedule
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicationsTableReferences
+                              ._schedulesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).schedulesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicationId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (intakesRefs)
+                        await $_getPrefetchedData<
+                          Medication,
+                          $MedicationsTable,
+                          Intake
+                        >(
+                          currentTable: table,
+                          referencedTable: $$MedicationsTableReferences
+                              ._intakesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$MedicationsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).intakesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.medicationId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$MedicationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $MedicationsTable,
+      Medication,
+      $$MedicationsTableFilterComposer,
+      $$MedicationsTableOrderingComposer,
+      $$MedicationsTableAnnotationComposer,
+      $$MedicationsTableCreateCompanionBuilder,
+      $$MedicationsTableUpdateCompanionBuilder,
+      (Medication, $$MedicationsTableReferences),
+      Medication,
+      PrefetchHooks Function({bool schedulesRefs, bool intakesRefs})
+    >;
+typedef $$SchedulesTableCreateCompanionBuilder = SchedulesCompanion Function({
+  Value<int> id,
+  required int medicationId,
+  required String timesInMinutes,
+  required SchedulePeriodicity periodicity,
+  Value<String?> weekdays,
+  Value<bool> isActive,
+});
+typedef $$SchedulesTableUpdateCompanionBuilder = SchedulesCompanion Function({
+  Value<int> id,
+  Value<int> medicationId,
+  Value<String> timesInMinutes,
+  Value<SchedulePeriodicity> periodicity,
+  Value<String?> weekdays,
+  Value<bool> isActive,
+});
+
+final class $$SchedulesTableReferences
+    extends BaseReferences<_$AppDatabase, $SchedulesTable, Schedule> {
+  $$SchedulesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $MedicationsTable _medicationIdTable(_$AppDatabase db) =>
+      db.medications.createAlias('schedules__medication_id__medications__id');
+
+  $$MedicationsTableProcessedTableManager get medicationId {
+    final $_column = $_itemColumn<int>('medication_id')!;
+
+    final manager = $$MedicationsTableTableManager(
+      $_db,
+      $_db.medications,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$IntakesTable, List<Intake>> _intakesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.intakes,
+    aliasName: 'schedules__id__intakes__schedule_id',
+  );
+
+  $$IntakesTableProcessedTableManager get intakesRefs {
+    final manager = $$IntakesTableTableManager(
+      $_db,
+      $_db.intakes,
+    ).filter((f) => f.scheduleId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_intakesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$SchedulesTableFilterComposer
+    extends Composer<_$AppDatabase, $SchedulesTable> {
+  $$SchedulesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timesInMinutes => $composableBuilder(
+    column: $table.timesInMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SchedulePeriodicity, SchedulePeriodicity, int>
+  get periodicity => $composableBuilder(
+    column: $table.periodicity,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get weekdays => $composableBuilder(
+    column: $table.weekdays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$MedicationsTableFilterComposer get medicationId {
+    final $$MedicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> intakesRefs(
+    Expression<bool> Function($$IntakesTableFilterComposer f) f,
+  ) {
+    final $$IntakesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.intakes,
+      getReferencedColumn: (t) => t.scheduleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IntakesTableFilterComposer(
+            $db: $db,
+            $table: $db.intakes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$SchedulesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SchedulesTable> {
+  $$SchedulesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timesInMinutes => $composableBuilder(
+    column: $table.timesInMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get periodicity => $composableBuilder(
+    column: $table.periodicity,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get weekdays => $composableBuilder(
+    column: $table.weekdays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$MedicationsTableOrderingComposer get medicationId {
+    final $$MedicationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SchedulesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SchedulesTable> {
+  $$SchedulesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get timesInMinutes => $composableBuilder(
+    column: $table.timesInMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<SchedulePeriodicity, int> get periodicity =>
+      $composableBuilder(
+        column: $table.periodicity,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get weekdays =>
+      $composableBuilder(column: $table.weekdays, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  $$MedicationsTableAnnotationComposer get medicationId {
+    final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> intakesRefs<T extends Object>(
+    Expression<T> Function($$IntakesTableAnnotationComposer a) f,
+  ) {
+    final $$IntakesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.intakes,
+      getReferencedColumn: (t) => t.scheduleId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$IntakesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.intakes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$SchedulesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SchedulesTable,
+          Schedule,
+          $$SchedulesTableFilterComposer,
+          $$SchedulesTableOrderingComposer,
+          $$SchedulesTableAnnotationComposer,
+          $$SchedulesTableCreateCompanionBuilder,
+          $$SchedulesTableUpdateCompanionBuilder,
+          (Schedule, $$SchedulesTableReferences),
+          Schedule,
+          PrefetchHooks Function({bool medicationId, bool intakesRefs})
+        > {
+  $$SchedulesTableTableManager(_$AppDatabase db, $SchedulesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SchedulesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SchedulesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SchedulesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> medicationId = const Value.absent(),
+                Value<String> timesInMinutes = const Value.absent(),
+                Value<SchedulePeriodicity> periodicity = const Value.absent(),
+                Value<String?> weekdays = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => SchedulesCompanion(
+                id: id,
+                medicationId: medicationId,
+                timesInMinutes: timesInMinutes,
+                periodicity: periodicity,
+                weekdays: weekdays,
+                isActive: isActive,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int medicationId,
+                required String timesInMinutes,
+                required SchedulePeriodicity periodicity,
+                Value<String?> weekdays = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+              }) => SchedulesCompanion.insert(
+                id: id,
+                medicationId: medicationId,
+                timesInMinutes: timesInMinutes,
+                periodicity: periodicity,
+                weekdays: weekdays,
+                isActive: isActive,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$SchedulesTable, Schedule>(table),
+                  $$SchedulesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({medicationId = false, intakesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (intakesRefs) db.intakes],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (medicationId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.medicationId,
+                        referencedTable: $$SchedulesTableReferences
+                            ._medicationIdTable(db),
+                        referencedColumn: $$SchedulesTableReferences
+                            ._medicationIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (intakesRefs)
+                    await $_getPrefetchedData<
+                      Schedule,
+                      $SchedulesTable,
+                      Intake
+                    >(
+                      currentTable: table,
+                      referencedTable: $$SchedulesTableReferences
+                          ._intakesRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$SchedulesTableReferences(db, table, p0).intakesRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.scheduleId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$SchedulesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SchedulesTable,
+      Schedule,
+      $$SchedulesTableFilterComposer,
+      $$SchedulesTableOrderingComposer,
+      $$SchedulesTableAnnotationComposer,
+      $$SchedulesTableCreateCompanionBuilder,
+      $$SchedulesTableUpdateCompanionBuilder,
+      (Schedule, $$SchedulesTableReferences),
+      Schedule,
+      PrefetchHooks Function({bool medicationId, bool intakesRefs})
+    >;
+typedef $$IntakesTableCreateCompanionBuilder = IntakesCompanion Function({
+  Value<int> id,
+  required int scheduleId,
+  required int medicationId,
+  required DateTime plannedAt,
+  Value<DateTime?> takenAt,
+  required IntakeStatus status,
+});
+typedef $$IntakesTableUpdateCompanionBuilder = IntakesCompanion Function({
+  Value<int> id,
+  Value<int> scheduleId,
+  Value<int> medicationId,
+  Value<DateTime> plannedAt,
+  Value<DateTime?> takenAt,
+  Value<IntakeStatus> status,
+});
+
+final class $$IntakesTableReferences
+    extends BaseReferences<_$AppDatabase, $IntakesTable, Intake> {
+  $$IntakesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SchedulesTable _scheduleIdTable(_$AppDatabase db) =>
+      db.schedules.createAlias('intakes__schedule_id__schedules__id');
+
+  $$SchedulesTableProcessedTableManager get scheduleId {
+    final $_column = $_itemColumn<int>('schedule_id')!;
+
+    final manager = $$SchedulesTableTableManager(
+      $_db,
+      $_db.schedules,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_scheduleIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $MedicationsTable _medicationIdTable(_$AppDatabase db) =>
+      db.medications.createAlias('intakes__medication_id__medications__id');
+
+  $$MedicationsTableProcessedTableManager get medicationId {
+    final $_column = $_itemColumn<int>('medication_id')!;
+
+    final manager = $$MedicationsTableTableManager(
+      $_db,
+      $_db.medications,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_medicationIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$IntakesTableFilterComposer
+    extends Composer<_$AppDatabase, $IntakesTable> {
+  $$IntakesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get plannedAt => $composableBuilder(
+    column: $table.plannedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get takenAt => $composableBuilder(
+    column: $table.takenAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<IntakeStatus, IntakeStatus, int> get status =>
+      $composableBuilder(
+        column: $table.status,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  $$SchedulesTableFilterComposer get scheduleId {
+    final $$SchedulesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.scheduleId,
+      referencedTable: $db.schedules,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SchedulesTableFilterComposer(
+            $db: $db,
+            $table: $db.schedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicationsTableFilterComposer get medicationId {
+    final $$MedicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$IntakesTableOrderingComposer
+    extends Composer<_$AppDatabase, $IntakesTable> {
+  $$IntakesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get plannedAt => $composableBuilder(
+    column: $table.plannedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get takenAt => $composableBuilder(
+    column: $table.takenAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SchedulesTableOrderingComposer get scheduleId {
+    final $$SchedulesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.scheduleId,
+      referencedTable: $db.schedules,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SchedulesTableOrderingComposer(
+            $db: $db,
+            $table: $db.schedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicationsTableOrderingComposer get medicationId {
+    final $$MedicationsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableOrderingComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$IntakesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $IntakesTable> {
+  $$IntakesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get plannedAt =>
+      $composableBuilder(column: $table.plannedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get takenAt =>
+      $composableBuilder(column: $table.takenAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<IntakeStatus, int> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  $$SchedulesTableAnnotationComposer get scheduleId {
+    final $$SchedulesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.scheduleId,
+      referencedTable: $db.schedules,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SchedulesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.schedules,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$MedicationsTableAnnotationComposer get medicationId {
+    final $$MedicationsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.medicationId,
+      referencedTable: $db.medications,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$MedicationsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.medications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$IntakesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $IntakesTable,
+          Intake,
+          $$IntakesTableFilterComposer,
+          $$IntakesTableOrderingComposer,
+          $$IntakesTableAnnotationComposer,
+          $$IntakesTableCreateCompanionBuilder,
+          $$IntakesTableUpdateCompanionBuilder,
+          (Intake, $$IntakesTableReferences),
+          Intake,
+          PrefetchHooks Function({bool scheduleId, bool medicationId})
+        > {
+  $$IntakesTableTableManager(_$AppDatabase db, $IntakesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$IntakesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$IntakesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$IntakesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> scheduleId = const Value.absent(),
+                Value<int> medicationId = const Value.absent(),
+                Value<DateTime> plannedAt = const Value.absent(),
+                Value<DateTime?> takenAt = const Value.absent(),
+                Value<IntakeStatus> status = const Value.absent(),
+              }) => IntakesCompanion(
+                id: id,
+                scheduleId: scheduleId,
+                medicationId: medicationId,
+                plannedAt: plannedAt,
+                takenAt: takenAt,
+                status: status,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int scheduleId,
+                required int medicationId,
+                required DateTime plannedAt,
+                Value<DateTime?> takenAt = const Value.absent(),
+                required IntakeStatus status,
+              }) => IntakesCompanion.insert(
+                id: id,
+                scheduleId: scheduleId,
+                medicationId: medicationId,
+                plannedAt: plannedAt,
+                takenAt: takenAt,
+                status: status,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$IntakesTable, Intake>(table),
+                  $$IntakesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({scheduleId = false, medicationId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (scheduleId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.scheduleId,
+                        referencedTable: $$IntakesTableReferences
+                            ._scheduleIdTable(db),
+                        referencedColumn: $$IntakesTableReferences
+                            ._scheduleIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (medicationId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.medicationId,
+                        referencedTable: $$IntakesTableReferences
+                            ._medicationIdTable(db),
+                        referencedColumn: $$IntakesTableReferences
+                            ._medicationIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$IntakesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $IntakesTable,
+      Intake,
+      $$IntakesTableFilterComposer,
+      $$IntakesTableOrderingComposer,
+      $$IntakesTableAnnotationComposer,
+      $$IntakesTableCreateCompanionBuilder,
+      $$IntakesTableUpdateCompanionBuilder,
+      (Intake, $$IntakesTableReferences),
+      Intake,
+      PrefetchHooks Function({bool scheduleId, bool medicationId})
+    >;
+
+class $AppDatabaseManager {
+  final _$AppDatabase _db;
+  $AppDatabaseManager(this._db);
+  $$MedicationsTableTableManager get medications =>
+      $$MedicationsTableTableManager(_db, _db.medications);
+  $$SchedulesTableTableManager get schedules =>
+      $$SchedulesTableTableManager(_db, _db.schedules);
+  $$IntakesTableTableManager get intakes =>
+      $$IntakesTableTableManager(_db, _db.intakes);
+}
+
+
+=== FILE: lib/data/repositories/intake_repository_impl.dart ===
+import 'package:drift/drift.dart';
+
+import '../../domain/entities/enums.dart' as domain_enums;
+import '../../domain/entities/intake.dart' as domain;
+import '../../domain/repositories/intake_repository.dart';
+import '../local/database.dart' as db;
+
+/// Р РµР°Р»РёР·Р°С†РёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ С„Р°РєС‚РѕРІ РїСЂРёС‘РјР° С‡РµСЂРµР· Drift.
+class IntakeRepositoryImpl implements IntakeRepository {
+  final db.AppDatabase _db;
+
+  IntakeRepositoryImpl(this._db);
+
+  @override
+  Future<List<domain.Intake>> getToday() async {
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    final rows = await (_db.select(_db.intakes)
+      ..where((t) =>
+      t.plannedAt.isBiggerOrEqualValue(startOfDay) &
+      t.plannedAt.isSmallerThanValue(endOfDay))
+      ..orderBy([(t) => OrderingTerm(expression: t.plannedAt)]))
+        .get();
+
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<List<domain.Intake>> getByMedicationId(int medicationId) async {
+    final rows = await (_db.select(_db.intakes)
+      ..where((t) => t.medicationId.equals(medicationId))
+      ..orderBy([(t) => OrderingTerm(expression: t.plannedAt, mode: OrderingMode.desc)]))
+        .get();
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<int> add(domain.Intake intake) async {
+    return _db.into(_db.intakes).insert(_toCompanion(intake));
+  }
+
+  @override
+  Future<void> markTaken(int intakeId, DateTime takenAt) async {
+    await (_db.update(_db.intakes)..where((t) => t.id.equals(intakeId))).write(
+      db.IntakesCompanion(
+        status: Value(domain_enums.IntakeStatus.taken),
+        takenAt: Value(takenAt),
+      ),
+    );
+  }
+
+  @override
+  Future<void> markSkipped(int intakeId) async {
+    await (_db.update(_db.intakes)..where((t) => t.id.equals(intakeId))).write(
+      const db.IntakesCompanion(
+        status: Value(domain_enums.IntakeStatus.skipped),
+      ),
+    );
+  }
+
+  @override
+  Future<void> markPostponed(int intakeId, Duration postponeBy) async {
+    final row = await (_db.select(_db.intakes)
+      ..where((t) => t.id.equals(intakeId)))
+        .getSingle();
+    final newTime = row.plannedAt.add(postponeBy);
+
+    await (_db.update(_db.intakes)..where((t) => t.id.equals(intakeId))).write(
+      db.IntakesCompanion(
+        plannedAt: Value(newTime),
+        status: Value(domain_enums.IntakeStatus.postponed),
+      ),
+    );
+  }
+
+  @override
+  Future<List<domain.Intake>> getByDateRange(DateTime start, DateTime end) async {
+    final rows = await (_db.select(_db.intakes)
+      ..where((t) =>
+      t.plannedAt.isBiggerOrEqualValue(start) &
+      t.plannedAt.isSmallerThanValue(end))
+      ..orderBy([(t) => OrderingTerm(expression: t.plannedAt)]))
+        .get();
+
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<void> markPending(int intakeId) async {
+    await (_db.update(_db.intakes)..where((t) => t.id.equals(intakeId))).write(
+      const db.IntakesCompanion(
+        status: Value(domain_enums.IntakeStatus.pending),
+        takenAt: Value(null), // РћС‡РёС‰Р°РµРј РІСЂРµРјСЏ РїСЂРёС‘РјР°
+      ),
+    );
+  }
+
+  // в”Ђв”Ђв”Ђ РњР°РїРїРёРЅРі в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+  domain.Intake _toDomain(db.Intake row) {
+    return domain.Intake(
+      id: row.id,
+      scheduleId: row.scheduleId,
+      medicationId: row.medicationId,
+      plannedAt: row.plannedAt,
+      takenAt: row.takenAt,
+      status: row.status,
+    );
+  }
+
+  db.IntakesCompanion _toCompanion(domain.Intake i, {bool includeId = false}) {
+    return db.IntakesCompanion(
+      id: includeId && i.id != null ? Value(i.id!) : const Value.absent(),
+      scheduleId: Value(i.scheduleId),
+      medicationId: Value(i.medicationId),
+      plannedAt: Value(i.plannedAt),
+      takenAt: Value(i.takenAt),
+      status: Value(i.status),
+    );
+  }
+
+
+}
+
+=== FILE: lib/data/repositories/medication_repository_impl.dart ===
+import 'package:drift/drift.dart';
+
+import '../../domain/entities/enums.dart' as domain_enums;
+import '../../domain/entities/medication.dart' as domain;
+import '../../domain/repositories/medication_repository.dart';
+import '../local/database.dart' as db;
+
+/// Р РµР°Р»РёР·Р°С†РёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ Р»РµРєР°СЂСЃС‚РІ С‡РµСЂРµР· Drift.
+class MedicationRepositoryImpl implements MedicationRepository {
+  final db.AppDatabase _db;
+
+  MedicationRepositoryImpl(this._db);
+
+  @override
+  Future<List<domain.Medication>> getAll() async {
+    final rows = await _db.select(_db.medications).get();
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<domain.Medication?> getById(int id) async {
+    final row = await (_db.select(_db.medications)
+      ..where((t) => t.id.equals(id)))
+        .getSingleOrNull();
+    return row == null ? null : _toDomain(row);
+  }
+
+  @override
+  Future<int> add(domain.Medication medication) async {
+    return _db.into(_db.medications).insert(_toCompanion(medication));
+  }
+
+  @override
+  Future<void> update(domain.Medication medication) async {
+    await (_db.update(_db.medications)
+      ..where((t) => t.id.equals(medication.id!)))
+        .write(_toCompanion(medication, includeId: false));
+  }
+
+  @override
+  Future<void> delete(int id) async {
+    await (_db.delete(_db.medications)..where((t) => t.id.equals(id))).go();
+  }
+
+  // в”Ђв”Ђв”Ђ РњР°РїРїРёРЅРі в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+  domain.Medication _toDomain(db.Medication row) {
+    return domain.Medication(
+      id: row.id,
+      name: row.name,
+      dosage: row.dosage,
+      form: _formFromDb(row.form),
+      photoPath: row.photoPath,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      notes: row.notes,
+    );
+  }
+
+  db.MedicationsCompanion _toCompanion(
+      domain.Medication m, {
+        bool includeId = false,
+      }) {
+    return db.MedicationsCompanion(
+      id: includeId && m.id != null
+          ? Value(m.id!)
+          : const Value.absent(),
+      name: Value(m.name),
+      dosage: Value(m.dosage),
+      form: Value(_formToDb(m.form)),
+      photoPath: Value(m.photoPath),
+      startDate: Value(m.startDate),
+      endDate: Value(m.endDate),
+      notes: Value(m.notes),
+    );
+  }
+
+  domain_enums.MedicationForm _formFromDb(domain_enums.MedicationForm value) {
+    return value;
+  }
+
+  domain_enums.MedicationForm _formToDb(domain_enums.MedicationForm value) {
+    return value;
+  }
+}
+
+=== FILE: lib/data/repositories/schedule_repository_impl.dart ===
+import 'package:drift/drift.dart';
+
+import '../../domain/entities/enums.dart' as domain_enums;
+import '../../domain/entities/schedule.dart' as domain;
+import '../../domain/repositories/schedule_repository.dart';
+import '../local/database.dart' as db;
+
+/// Р РµР°Р»РёР·Р°С†РёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ СЂР°СЃРїРёСЃР°РЅРёР№ С‡РµСЂРµР· Drift.
+class ScheduleRepositoryImpl implements ScheduleRepository {
+  final db.AppDatabase _db;
+
+  ScheduleRepositoryImpl(this._db);
+
+  @override
+  Future<List<domain.Schedule>> getByMedicationId(int medicationId) async {
+    final rows = await (_db.select(_db.schedules)
+      ..where((t) => t.medicationId.equals(medicationId)))
+        .get();
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<List<domain.Schedule>> getActive() async {
+    final rows = await (_db.select(_db.schedules)
+      ..where((t) => t.isActive.equals(true)))
+        .get();
+    return rows.map(_toDomain).toList();
+  }
+
+  @override
+  Future<int> add(domain.Schedule schedule) async {
+    return _db.into(_db.schedules).insert(_toCompanion(schedule));
+  }
+
+  @override
+  Future<void> update(domain.Schedule schedule) async {
+    await (_db.update(_db.schedules)
+      ..where((t) => t.id.equals(schedule.id!)))
+        .write(_toCompanion(schedule, includeId: false));
+  }
+
+  @override
+  Future<void> delete(int id) async {
+    await (_db.delete(_db.schedules)..where((t) => t.id.equals(id))).go();
+  }
+
+  // в”Ђв”Ђв”Ђ РњР°РїРїРёРЅРі в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+  domain.Schedule _toDomain(db.Schedule row) {
+    return domain.Schedule(
+      id: row.id,
+      medicationId: row.medicationId,
+      timesInMinutes: _parseIntList(row.timesInMinutes),
+      periodicity: row.periodicity,
+      weekdays: row.weekdays == null ? null : _parseIntList(row.weekdays!),
+      isActive: row.isActive,
+    );
+  }
+
+  db.SchedulesCompanion _toCompanion(
+      domain.Schedule s, {
+        bool includeId = false,
+      }) {
+    return db.SchedulesCompanion(
+      id: includeId && s.id != null
+          ? Value(s.id!)
+          : const Value.absent(),
+      medicationId: Value(s.medicationId),
+      timesInMinutes: Value(_joinIntList(s.timesInMinutes)),
+      periodicity: Value(s.periodicity),
+      weekdays: Value(s.weekdays == null ? null : _joinIntList(s.weekdays!)),
+      isActive: Value(s.isActive),
+    );
+  }
+
+  // в”Ђв”Ђв”Ђ РЈС‚РёР»РёС‚С‹ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+  String _joinIntList(List<int> list) => list.join(',');
+
+  List<int> _parseIntList(String raw) {
+    if (raw.isEmpty) return [];
+    return raw.split(',').map(int.parse).toList();
+  }
+}
+
+=== FILE: lib/domain/entities/enums.dart ===
+// РџРµСЂРµС‡РёСЃР»РµРЅРёСЏ РїСЂРµРґРјРµС‚РЅРѕР№ РѕР±Р»Р°СЃС‚Рё РїСЂРёР»РѕР¶РµРЅРёСЏ В«РўР°Р±Р»РµС‚РѕС‡РЅРёС†Р°В».
+
+/// Р›РµРєР°СЂСЃС‚РІРµРЅРЅР°СЏ С„РѕСЂРјР°.
+enum MedicationForm {
+  tablet,
+  capsule,
+  syrup,
+  injection,
+  drops,
+  other,
+}
+
+/// РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ РїСЂРёС‘РјР°.
+enum SchedulePeriodicity {
+  /// РљР°Р¶РґС‹Р№ РґРµРЅСЊ.
+  daily,
+
+  /// Р§РµСЂРµР· РґРµРЅСЊ.
+  everyOtherDay,
+
+  /// РџРѕ РєРѕРЅРєСЂРµС‚РЅС‹Рј РґРЅСЏРј РЅРµРґРµР»Рё (СЃРј. Schedule.weekdays).
+  specificDaysOfWeek,
+}
+
+/// РЎС‚Р°С‚СѓСЃ С„Р°РєС‚Р° РїСЂРёС‘РјР°.
+enum IntakeStatus {
+  /// РћР¶РёРґР°РµС‚СЃСЏ.
+  pending,
+
+  /// РџСЂРёРЅСЏС‚Рѕ.
+  taken,
+
+  /// РџСЂРѕРїСѓС‰РµРЅРѕ.
+  skipped,
+
+  /// РћС‚Р»РѕР¶РµРЅРѕ.
+  postponed,
+}
+
+=== FILE: lib/domain/entities/intake.dart ===
+import 'enums.dart';
+
+/// РЎСѓС‰РЅРѕСЃС‚СЊ В«Р¤Р°РєС‚ РїСЂРёС‘РјР°В».
+///
+/// Р’СЂРµРјСЏ С…СЂР°РЅРёРј РІ UTC, С‡С‚РѕР±С‹ РЅРµ СЃР»РѕРјР°С‚СЊСЃСЏ РїСЂРё СЃРјРµРЅРµ С‡Р°СЃРѕРІРѕРіРѕ РїРѕСЏСЃР°.
+class Intake {
+  final int? id;
+  final int scheduleId;
+  final int medicationId;
+  final DateTime plannedAt;
+  final DateTime? takenAt;
+  final IntakeStatus status;
+
+  const Intake({
+    this.id,
+    required this.scheduleId,
+    required this.medicationId,
+    required this.plannedAt,
+    this.takenAt,
+    this.status = IntakeStatus.pending,
+  });
+
+  Intake copyWith({
+    int? id,
+    int? scheduleId,
+    int? medicationId,
+    DateTime? plannedAt,
+    DateTime? takenAt,
+    IntakeStatus? status,
+  }) {
+    return Intake(
+      id: id ?? this.id,
+      scheduleId: scheduleId ?? this.scheduleId,
+      medicationId: medicationId ?? this.medicationId,
+      plannedAt: plannedAt ?? this.plannedAt,
+      takenAt: takenAt ?? this.takenAt,
+      status: status ?? this.status,
+    );
+  }
+
+  @override
+  String toString() =>
+      'Intake(id: $id, medicationId: $medicationId, plannedAt: $plannedAt, status: $status)';
+}
+
+=== FILE: lib/domain/entities/medication.dart ===
+import 'enums.dart';
+
+/// РЎСѓС‰РЅРѕСЃС‚СЊ В«Р›РµРєР°СЂСЃС‚РІРѕВ».
+///
+/// Р§РёСЃС‚Р°СЏ Domain-РјРѕРґРµР»СЊ: РЅРµ Р·РЅР°РµС‚ РЅРё Рѕ Drift, РЅРё Рѕ Flutter.
+class Medication {
+  final int? id;
+  final String name;
+  final String? dosage;
+  final MedicationForm form;
+  final String? photoPath;
+  final DateTime startDate;
+  final DateTime? endDate;
+  final String? notes;
+
+  const Medication({
+    this.id,
+    required this.name,
+    this.dosage,
+    required this.form,
+    this.photoPath,
+    required this.startDate,
+    this.endDate,
+    this.notes,
+  });
+
+  Medication copyWith({
+    int? id,
+    String? name,
+    String? dosage,
+    MedicationForm? form,
+    String? photoPath,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? notes,
+  }) {
+    return Medication(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      dosage: dosage ?? this.dosage,
+      form: form ?? this.form,
+      photoPath: photoPath ?? this.photoPath,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  String toString() => 'Medication(id: $id, name: $name, dosage: $dosage)';
+}
+
+=== FILE: lib/domain/entities/schedule.dart ===
+import 'enums.dart';
+
+/// РЎСѓС‰РЅРѕСЃС‚СЊ В«Р Р°СЃРїРёСЃР°РЅРёРµ РїСЂРёС‘РјР°В».
+///
+/// timesInMinutes вЂ” СЃРїРёСЃРѕРє РІСЂРµРјС‘РЅ РІ РјРёРЅСѓС‚Р°С… РѕС‚ РЅР°С‡Р°Р»Р° СЃСѓС‚РѕРє.
+/// РќР°РїСЂРёРјРµСЂ, [480, 840, 1200] = 8:00, 14:00, 20:00.
+class Schedule {
+  final int? id;
+  final int medicationId;
+  final List<int> timesInMinutes;
+  final SchedulePeriodicity periodicity;
+
+  /// Р”РЅРё РЅРµРґРµР»Рё РґР»СЏ periodicity == specificDaysOfWeek.
+  /// 1 = РџРЅ, 2 = Р’С‚, ..., 7 = Р’СЃ.
+  final List<int>? weekdays;
+
+  final bool isActive;
+
+  const Schedule({
+    this.id,
+    required this.medicationId,
+    required this.timesInMinutes,
+    required this.periodicity,
+    this.weekdays,
+    this.isActive = true,
+  });
+
+  Schedule copyWith({
+    int? id,
+    int? medicationId,
+    List<int>? timesInMinutes,
+    SchedulePeriodicity? periodicity,
+    List<int>? weekdays,
+    bool? isActive,
+  }) {
+    return Schedule(
+      id: id ?? this.id,
+      medicationId: medicationId ?? this.medicationId,
+      timesInMinutes: timesInMinutes ?? this.timesInMinutes,
+      periodicity: periodicity ?? this.periodicity,
+      weekdays: weekdays ?? this.weekdays,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  @override
+  String toString() =>
+      'Schedule(id: $id, medicationId: $medicationId, times: $timesInMinutes)';
+}
+
+=== FILE: lib/domain/repositories/intake_repository.dart ===
+import '../entities/intake.dart';
+
+/// РђР±СЃС‚СЂР°РєС†РёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ С„Р°РєС‚РѕРІ РїСЂРёС‘РјР°.
+abstract class IntakeRepository {
+  Future<List<Intake>> getToday();
+  Future<List<Intake>> getByMedicationId(int medicationId);
+  Future<int> add(Intake intake);
+  Future<void> markTaken(int intakeId, DateTime takenAt);
+  Future<void> markSkipped(int intakeId);
+  Future<void> markPostponed(int intakeId, Duration postponeBy);
+  Future<List<Intake>> getByDateRange(DateTime start, DateTime end);
+  Future<void> markPending(int intakeId);
+}
+
+=== FILE: lib/domain/repositories/medication_repository.dart ===
+import '../entities/medication.dart';
+
+/// РђР±СЃС‚СЂР°РєС†РёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ Р»РµРєР°СЂСЃС‚РІ.
+///
+/// Domain РЅРµ Р·РЅР°РµС‚, РєР°Рє РёРјРµРЅРЅРѕ С…СЂР°РЅСЏС‚СЃСЏ РґР°РЅРЅС‹Рµ.
+/// Р РµР°Р»РёР·Р°С†РёСЏ Р±СѓРґРµС‚ РІ data/repositories/medication_repository_impl.dart.
+abstract class MedicationRepository {
+  Future<List<Medication>> getAll();
+  Future<Medication?> getById(int id);
+  Future<int> add(Medication medication);
+  Future<void> update(Medication medication);
+  Future<void> delete(int id);
+}
+
+=== FILE: lib/domain/repositories/schedule_repository.dart ===
+import '../entities/schedule.dart';
+
+/// РђР±СЃС‚СЂР°РєС†РёСЏ СЂРµРїРѕР·РёС‚РѕСЂРёСЏ СЂР°СЃРїРёСЃР°РЅРёР№.
+abstract class ScheduleRepository {
+  Future<List<Schedule>> getByMedicationId(int medicationId);
+  Future<List<Schedule>> getActive();
+  Future<int> add(Schedule schedule);
+  Future<void> update(Schedule schedule);
+  Future<void> delete(int id);
+}
+
+=== FILE: lib/domain/usecases/generate_intakes.dart ===
+import '../entities/enums.dart';
+import '../entities/intake.dart';
+import '../entities/schedule.dart';
+
+/// Р“РµРЅРµСЂРёСЂСѓРµС‚ СЃРїРёСЃРѕРє Intake РґР»СЏ СЂР°СЃРїРёСЃР°РЅРёСЏ РЅР° РєРѕРЅРєСЂРµС‚РЅСѓСЋ РґР°С‚Сѓ.
+///
+/// Р›РѕРіРёРєР°:
+/// - daily: РїСЂРёС‘РјС‹ РєР°Р¶РґС‹Р№ РґРµРЅСЊ
+/// - everyOtherDay: РїСЂРёС‘РјС‹ С‡РµСЂРµР· РґРµРЅСЊ (СЃС‡РёС‚Р°РµРј РѕС‚ startDate)
+/// - specificDaysOfWeek: С‚РѕР»СЊРєРѕ РІ СѓРєР°Р·Р°РЅРЅС‹Рµ РґРЅРё РЅРµРґРµР»Рё
+List<Intake> generateIntakesForDate({
+  required Schedule schedule,
+  required DateTime date,
+  required DateTime scheduleStartDate,
+}) {
+  final intakes = <Intake>[];
+
+  // РџСЂРѕРІРµСЂСЏРµРј, РїРѕРїР°РґР°РµС‚ Р»Рё РґР°С‚Р° РІ СЂР°СЃРїРёСЃР°РЅРёРµ
+  if (!_shouldTakeOnDate(schedule, date, scheduleStartDate)) {
+    return intakes;
+  }
+
+  // РЎРѕР·РґР°С‘Рј Intake РґР»СЏ РєР°Р¶РґРѕРіРѕ РІСЂРµРјРµРЅРё
+  for (final minutes in schedule.timesInMinutes) {
+    final plannedAt = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      minutes ~/ 60,
+      minutes % 60,
+    );
+    intakes.add(Intake(
+      scheduleId: schedule.id!,
+      medicationId: schedule.medicationId,
+      plannedAt: plannedAt,
+    ));
+  }
+
+  return intakes;
+}
+
+bool _shouldTakeOnDate(
+    Schedule schedule,
+    DateTime date,
+    DateTime startDate,
+    ) {
+  switch (schedule.periodicity) {
+    case SchedulePeriodicity.daily:
+      return true;
+
+    case SchedulePeriodicity.everyOtherDay:
+      final start = DateTime(startDate.year, startDate.month, startDate.day);
+      final current = DateTime(date.year, date.month, date.day);
+      final diff = current.difference(start).inDays;
+      return diff >= 0 && diff % 2 == 0;
+
+    case SchedulePeriodicity.specificDaysOfWeek:
+      if (schedule.weekdays == null || schedule.weekdays!.isEmpty) {
+        return false;
+      }
+      return schedule.weekdays!.contains(date.weekday);
+  }
+}
+
+=== FILE: lib/presentation/providers/add_medication_provider.dart ===
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../domain/entities/enums.dart';
+import '../../domain/entities/intake.dart';
+import '../../domain/entities/medication.dart';
+import '../../domain/entities/schedule.dart';
+import '../../domain/usecases/generate_intakes.dart';
+import 'repository_providers.dart';
+
+/// Р”РѕР±Р°РІР»СЏРµС‚ Р»РµРєР°СЂСЃС‚РІРѕ + СЂР°СЃРїРёСЃР°РЅРёРµ + РіРµРЅРµСЂРёСЂСѓРµС‚ РїСЂРёС‘РјС‹ РЅР° СЃРµРіРѕРґРЅСЏ.
+///
+/// Р’РѕР·РІСЂР°С‰Р°РµС‚ id СЃРѕР·РґР°РЅРЅРѕРіРѕ Р»РµРєР°СЂСЃС‚РІР°.
+Future<int> addMedicationWithSchedule({
+  required WidgetRef ref,
+  required String name,
+  required String? dosage,
+  required MedicationForm form,
+  required String? photoPath,
+  required DateTime startDate,
+  required DateTime? endDate,
+  required List<int> timesInMinutes,
+  required SchedulePeriodicity periodicity,
+  required List<int>? weekdays,
+}) async {
+  final medRepo = ref.read(medicationRepositoryProvider);
+  final schedRepo = ref.read(scheduleRepositoryProvider);
+  final intakeRepo = ref.read(intakeRepositoryProvider);
+
+  // 1. РЎРѕС…СЂР°РЅСЏРµРј Р»РµРєР°СЂСЃС‚РІРѕ
+  final medId = await medRepo.add(Medication(
+    name: name,
+    dosage: dosage,
+    form: form,
+    photoPath: photoPath,
+    startDate: startDate,
+    endDate: endDate,
+  ));
+
+  // 2. РЎРѕС…СЂР°РЅСЏРµРј СЂР°СЃРїРёСЃР°РЅРёРµ
+  final schedule = Schedule(
+    medicationId: medId,
+    timesInMinutes: timesInMinutes,
+    periodicity: periodicity,
+    weekdays: weekdays,
+    isActive: true,
+  );
+  final schedId = await schedRepo.add(schedule);
+
+  // 3. Р“РµРЅРµСЂРёСЂСѓРµРј РїСЂРёС‘РјС‹ РЅР° РІРµСЃСЊ РїРµСЂРёРѕРґ РєСѓСЂСЃР°
+  final savedSchedule = schedule.copyWith(id: schedId);
+
+  // РћРїСЂРµРґРµР»СЏРµРј РіСЂР°РЅРёС†С‹ РіРµРЅРµСЂР°С†РёРё
+  final start = DateTime(startDate.year, startDate.month, startDate.day);
+  // Р•СЃР»Рё РґР°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ РЅРµ СѓРєР°Р·Р°РЅР°, РіРµРЅРµСЂРёСЂСѓРµРј РЅР° 30 РґРЅРµР№ РІРїРµСЂРµРґ (С‡С‚РѕР±С‹ РЅРµ Р·Р°РІРёСЃР»Рѕ)
+  final end = endDate != null
+      ? DateTime(endDate.year, endDate.month, endDate.day)
+      : start.add(const Duration(days: 30));
+
+  // РРґРµРј РїРѕ РґРЅСЏРј РѕС‚ РЅР°С‡Р°Р»Р° РґРѕ РєРѕРЅС†Р°
+  for (var day = start; day.isBefore(end.add(const Duration(days: 1))); day = day.add(const Duration(days: 1))) {
+    final intakesForDay = generateIntakesForDate(
+      schedule: savedSchedule,
+      date: day,
+      scheduleStartDate: startDate,
+    );
+
+    for (final intake in intakesForDay) {
+      await intakeRepo.add(intake);
+    }
+  }
+
+  return medId;
+}
+
+
+=== FILE: lib/presentation/providers/calendar_providers.dart ===
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../domain/entities/enums.dart';
+import '../../domain/entities/intake.dart';
+import '../../domain/entities/medication.dart';
+import 'repository_providers.dart';
+
+// РњРѕРґРµР»СЊ, РѕР±СЉРµРґРёРЅСЏСЋС‰Р°СЏ РїСЂРёС‘Рј Рё Р»РµРєР°СЂСЃС‚РІРѕ (Р°РЅР°Р»РѕРіРёС‡РЅРѕ TodayIntake)
+class CalendarIntake {
+  final Intake intake;
+  final Medication medication;
+
+  const CalendarIntake({required this.intake, required this.medication});
+
+  DateTime get plannedAt => intake.plannedAt;
+  IntakeStatus get status => intake.status;
+  String get medicationName => medication.name;
+  String? get dosage => medication.dosage;
+  MedicationForm get form => medication.form;
+}
+
+// РџСЂРѕРІР°Р№РґРµСЂ, РєРѕС‚РѕСЂС‹Р№ Р·Р°РіСЂСѓР¶Р°РµС‚ РїСЂРёС‘РјС‹ РЅР° РєРѕРЅРєСЂРµС‚РЅС‹Р№ РјРµСЃСЏС† (СЃРµРјРµР№СЃС‚РІРѕ РїСЂРѕРІР°Р№РґРµСЂРѕРІ)
+final monthIntakesProvider = FutureProvider.family<List<CalendarIntake>, DateTime>((ref, month) async {
+  final start = DateTime(month.year, month.month, 1);
+  final end = DateTime(month.year, month.month + 1, 1); // РџРµСЂРІРѕРµ С‡РёСЃР»Рѕ СЃР»РµРґСѓСЋС‰РµРіРѕ РјРµСЃСЏС†Р°
+
+  final intakeRepo = ref.watch(intakeRepositoryProvider);
+  final medRepo = ref.watch(medicationRepositoryProvider);
+
+  final intakes = await intakeRepo.getByDateRange(start, end);
+  final result = <CalendarIntake>[];
+
+  for (final intake in intakes) {
+    final med = await medRepo.getById(intake.medicationId);
+    if (med != null) {
+      result.add(CalendarIntake(intake: intake, medication: med));
+    }
+  }
+
+  return result;
+});
+
+=== FILE: lib/presentation/providers/database_provider.dart ===
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../data/local/database.dart';
+
+final databaseProvider = Provider<AppDatabase>((ref) {
+  final db = AppDatabase();
+  ref.onDispose(db.close);
+  return db;
+});
+
+=== FILE: lib/presentation/providers/medications_providers.dart ===
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../domain/entities/medication.dart';
+import 'repository_providers.dart';
+
+/// РџСЂРѕРІР°Р№РґРµСЂ СЃРїРёСЃРєР° Р»РµРєР°СЂСЃС‚РІ СЃ РїРѕРґРґРµСЂР¶РєРѕР№ СѓРґР°Р»РµРЅРёСЏ.
+final medicationsProvider =
+AsyncNotifierProvider<MedicationsNotifier, List<Medication>>(
+  MedicationsNotifier.new,
+);
+
+class MedicationsNotifier extends AsyncNotifier<List<Medication>> {
+  @override
+  Future<List<Medication>> build() async {
+    final repo = ref.watch(medicationRepositoryProvider);
+    return repo.getAll();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(medicationRepositoryProvider);
+      return repo.getAll();
+    });
+  }
+
+  Future<void> delete(int id) async {
+    final repo = ref.read(medicationRepositoryProvider);
+    await repo.delete(id);
+    await refresh();
+  }
+}
+
+=== FILE: lib/presentation/providers/repository_providers.dart ===
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../data/repositories/intake_repository_impl.dart';
+import '../../data/repositories/medication_repository_impl.dart';
+import '../../data/repositories/schedule_repository_impl.dart';
+import '../../domain/repositories/intake_repository.dart';
+import '../../domain/repositories/medication_repository.dart';
+import '../../domain/repositories/schedule_repository.dart';
+import 'database_provider.dart';
+
+final medicationRepositoryProvider = Provider<MedicationRepository>((ref) {
+  return MedicationRepositoryImpl(ref.watch(databaseProvider));
+});
+
+final scheduleRepositoryProvider = Provider<ScheduleRepository>((ref) {
+  return ScheduleRepositoryImpl(ref.watch(databaseProvider));
+});
+
+final intakeRepositoryProvider = Provider<IntakeRepository>((ref) {
+  return IntakeRepositoryImpl(ref.watch(databaseProvider));
+});
+
+=== FILE: lib/presentation/providers/today_providers.dart ===
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../domain/entities/intake.dart';
+import '../../domain/entities/medication.dart';
+import 'repository_providers.dart';
+import '../../domain/entities/enums.dart';
+
+/// РћР±СЉРµРґРёРЅС‘РЅРЅР°СЏ РјРѕРґРµР»СЊ: РїСЂРёС‘Рј + Р»РµРєР°СЂСЃС‚РІРѕ, Рє РєРѕС‚РѕСЂРѕРјСѓ РѕРЅ РѕС‚РЅРѕСЃРёС‚СЃСЏ.
+class TodayIntake {
+  final Intake intake;
+  final Medication medication;
+
+  const TodayIntake({required this.intake, required this.medication});
+
+  int get medicationId => medication.id!;
+  String get medicationName => medication.name;
+  String? get dosage => medication.dosage;
+  DateTime get plannedAt => intake.plannedAt;
+  IntakeStatus get status => intake.status;
+}
+
+/// РџСЂРѕРІР°Р№РґРµСЂ: РїСЂРёС‘РјС‹ РЅР° СЃРµРіРѕРґРЅСЏ + СЃРІСЏР·Р°РЅРЅС‹Рµ Р»РµРєР°СЂСЃС‚РІР°.
+///
+/// РџРѕСЂСЏРґРѕРє вЂ” РїРѕ РІСЂРµРјРµРЅРё РїСЂРёС‘РјР° (plannedAt).
+final todayIntakesProvider = FutureProvider<List<TodayIntake>>((ref) async {
+  final intakeRepo = ref.watch(intakeRepositoryProvider);
+  final medRepo = ref.watch(medicationRepositoryProvider);
+
+  final intakes = await intakeRepo.getToday();
+  final result = <TodayIntake>[];
+
+  for (final intake in intakes) {
+    final med = await medRepo.getById(intake.medicationId);
+    if (med != null) {
+      result.add(TodayIntake(intake: intake, medication: med));
+    }
+  }
+
+  result.sort((a, b) => a.plannedAt.compareTo(b.plannedAt));
+  return result;
+});
+
+=== FILE: lib/presentation/screens/add_medication/add_medication_screen.dart ===
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/enums.dart';
+import '../../providers/add_medication_provider.dart';
+import '../../providers/today_providers.dart';
+import '../../providers/calendar_providers.dart';
+import '../../providers/medications_providers.dart';
+
+class AddMedicationScreen extends ConsumerStatefulWidget {
+  const AddMedicationScreen({super.key});
+
+  @override
+  ConsumerState<AddMedicationScreen> createState() =>
+      _AddMedicationScreenState();
+}
+
+class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
+  final _nameController = TextEditingController();
+  final _dosageController = TextEditingController();
+
+  MedicationForm _form = MedicationForm.tablet;
+  DateTime _startDate = DateTime.now();
+  DateTime? _endDate;
+
+  // Р’СЂРµРјРµРЅР° РїСЂРёС‘РјР° (РІ РјРёРЅСѓС‚Р°С… РѕС‚ РЅР°С‡Р°Р»Р° СЃСѓС‚РѕРє)
+  final List<int> _times = [480]; // 8:00 РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
+
+  SchedulePeriodicity _periodicity = SchedulePeriodicity.daily;
+  final List<int> _weekdays = [];
+
+  bool _saving = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _dosageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ Р»РµРєР°СЂСЃС‚РІР°')),
+      );
+      return;
+    }
+    if (_times.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Р”РѕР±Р°РІСЊС‚Рµ С…РѕС‚СЏ Р±С‹ РѕРґРЅРѕ РІСЂРµРјСЏ РїСЂРёС‘РјР°')),
+      );
+      return;
+    }
+
+    setState(() => _saving = true);
+
+    try {
+      await addMedicationWithSchedule(
+        ref: ref,
+        name: _nameController.text.trim(),
+        dosage: _dosageController.text.trim().isEmpty
+            ? null
+            : _dosageController.text.trim(),
+        form: _form,
+        photoPath: null,
+        startDate: _startDate,
+        endDate: _endDate,
+        timesInMinutes: _times,
+        periodicity: _periodicity,
+        weekdays: _periodicity == SchedulePeriodicity.specificDaysOfWeek
+            ? _weekdays
+            : null,
+      );
+
+      ref.invalidate(todayIntakesProvider);
+      ref.invalidate(monthIntakesProvider); // РЎР±СЂРѕСЃ РєСЌС€Р° РєР°Р»РµРЅРґР°СЂСЏ
+      ref.invalidate(medicationsProvider);  // РЎР±СЂРѕСЃ РєСЌС€Р° СЃРїРёСЃРєР° Р»РµРєР°СЂСЃС‚РІ
+
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('РћС€РёР±РєР°: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: const Text('РќРѕРІРѕРµ Р»РµРєР°СЂСЃС‚РІРѕ'),
+      ),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // РќР°Р·РІР°РЅРёРµ
+            const _Label('РќР°Р·РІР°РЅРёРµ'),
+            TextField(
+              controller: _nameController,
+              decoration: _inputDecoration('РќР°РїСЂРёРјРµСЂ, РђСЃРїРёСЂРёРЅ'),
+            ),
+            const SizedBox(height: 16),
+
+            // Р”РѕР·РёСЂРѕРІРєР°
+            const _Label('Р”РѕР·РёСЂРѕРІРєР°'),
+            TextField(
+              controller: _dosageController,
+              decoration: _inputDecoration('500 РјРі'),
+            ),
+            const SizedBox(height: 16),
+
+            // Р¤РѕСЂРјР° РІС‹РїСѓСЃРєР°
+            const _Label('Р¤РѕСЂРјР° РІС‹РїСѓСЃРєР°'),
+            DropdownButtonFormField<MedicationForm>(
+              initialValue: _form,
+              decoration: _inputDecoration(null),
+              items: MedicationForm.values.map((f) {
+                return DropdownMenuItem(
+                  value: f,
+                  child: Text(_formLabel(f)),
+                );
+              }).toList(),
+              onChanged: (v) => setState(() => _form = v!),
+            ),
+            const SizedBox(height: 16),
+
+            // Р’СЂРµРјРµРЅР° РїСЂРёС‘РјР°
+            const _Label('Р’СЂРµРјСЏ РїСЂРёС‘РјР°'),
+            ..._times.asMap().entries.map((e) => _TimeRow(
+              minutes: e.value,
+              onChanged: (v) => setState(() => _times[e.key] = v),
+              onDelete: _times.length > 1
+                  ? () => setState(() => _times.removeAt(e.key))
+                  : null,
+            )),
+            TextButton.icon(
+              onPressed: () => setState(() => _times.add(480)),
+              icon: const Icon(Icons.add),
+              label: const Text('Р”РѕР±Р°РІРёС‚СЊ РІСЂРµРјСЏ'),
+            ),
+            const SizedBox(height: 16),
+
+            // РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ
+            const _Label('РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ'),
+            DropdownButtonFormField<SchedulePeriodicity>(
+              initialValue: _periodicity,
+              decoration: _inputDecoration(null),
+              items: SchedulePeriodicity.values.map((p) {
+                return DropdownMenuItem(
+                  value: p,
+                  child: Text(_periodicityLabel(p)),
+                );
+              }).toList(),
+              onChanged: (v) => setState(() => _periodicity = v!),
+            ),
+
+            // Р”РЅРё РЅРµРґРµР»Рё (РµСЃР»Рё specificDaysOfWeek)
+            if (_periodicity == SchedulePeriodicity.specificDaysOfWeek) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 6,
+                children: List.generate(7, (i) {
+                  final day = i + 1;
+                  final selected = _weekdays.contains(day);
+                  return FilterChip(
+                    label: Text(_weekdayLabel(day)),
+                    selected: selected,
+                    onSelected: (v) {
+                      setState(() {
+                        if (v) {
+                          _weekdays.add(day);
+                        } else {
+                          _weekdays.remove(day);
+                        }
+                      });
+                    },
+                  );
+                }),
+              ),
+            ],
+            const SizedBox(height: 16),
+
+            // Р”Р°С‚С‹
+            Row(
+              children: [
+                Expanded(
+                  child: _DateField(
+                    label: 'Р”Р°С‚Р° РЅР°С‡Р°Р»Р°',
+                    date: _startDate,
+                    onPick: (d) => setState(() => _startDate = d),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _DateField(
+                    label: 'Р”Р°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ',
+                    date: _endDate,
+                    onPick: (d) => setState(() => _endDate = d),
+                    onClear: _endDate == null
+                        ? null
+                        : () => setState(() => _endDate = null),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // РљРЅРѕРїРєР°
+            SizedBox(
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _saving ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.accentBlue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: _saving
+                    ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                    : const Text(
+                  'Р”РѕР±Р°РІРёС‚СЊ РІ СЂР°СЃРїРёСЃР°РЅРёРµ',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String? hint) {
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
+  String _formLabel(MedicationForm f) {
+    switch (f) {
+      case MedicationForm.tablet:
+        return 'РўР°Р±Р»РµС‚РєР°';
+      case MedicationForm.capsule:
+        return 'РљР°РїСЃСѓР»Р°';
+      case MedicationForm.syrup:
+        return 'РЎРёСЂРѕРї';
+      case MedicationForm.injection:
+        return 'РРЅСЉРµРєС†РёСЏ';
+      case MedicationForm.drops:
+        return 'РљР°РїР»Рё';
+      case MedicationForm.other:
+        return 'Р”СЂСѓРіРѕРµ';
+    }
+  }
+
+  String _periodicityLabel(SchedulePeriodicity p) {
+    switch (p) {
+      case SchedulePeriodicity.daily:
+        return 'РљР°Р¶РґС‹Р№ РґРµРЅСЊ';
+      case SchedulePeriodicity.everyOtherDay:
+        return 'Р§РµСЂРµР· РґРµРЅСЊ';
+      case SchedulePeriodicity.specificDaysOfWeek:
+        return 'РџРѕ РґРЅСЏРј РЅРµРґРµР»Рё';
+    }
+  }
+
+  String _weekdayLabel(int day) {
+    const names = ['РџРЅ', 'Р’С‚', 'РЎСЂ', 'Р§С‚', 'РџС‚', 'РЎР±', 'Р’СЃ'];
+    return names[day - 1];
+  }
+}
+
+// в”Ђв”Ђв”Ђ Р’СЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹Рµ РІРёРґР¶РµС‚С‹ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+
+class _Label extends StatelessWidget {
+  final String text;
+  const _Label(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6, left: 4),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+      ),
+    );
+  }
+}
+
+class _TimeRow extends StatelessWidget {
+  final int minutes;
+  final ValueChanged<int> onChanged;
+  final VoidCallback? onDelete;
+
+  const _TimeRow({
+    required this.minutes,
+    required this.onChanged,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final h = (minutes ~/ 60).toString().padLeft(2, '0');
+    final m = (minutes % 60).toString().padLeft(2, '0');
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay(
+                    hour: minutes ~/ 60,
+                    minute: minutes % 60,
+                  ),
+                );
+                if (picked != null) {
+                  onChanged(picked.hour * 60 + picked.minute);
+                }
+              },
+              icon: const Icon(Icons.access_time),
+              label: Text('$h:$m'),
+            ),
+          ),
+          if (onDelete != null)
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DateField extends StatelessWidget {
+  final String label;
+  final DateTime? date;
+  final ValueChanged<DateTime> onPick;
+  final VoidCallback? onClear;
+
+  const _DateField({
+    required this.label,
+    required this.date,
+    required this.onPick,
+    this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6, left: 4),
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        InkWell(
+          onTap: () async {
+            final picked = await showDatePicker(
+              context: context,
+              initialDate: date ?? DateTime.now(),
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2100),
+            );
+            if (picked != null) onPick(picked);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    date == null
+                        ? 'Р’С‹Р±СЂР°С‚СЊ РґР°С‚Сѓ'
+                        : '${date!.day}.${date!.month}.${date!.year}',
+                    style: TextStyle(
+                      color: date == null ? Colors.black54 : Colors.black87,
+                    ),
+                  ),
+                ),
+                if (onClear != null)
+                  GestureDetector(
+                    onTap: onClear,
+                    child: const Icon(Icons.close, size: 18),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+=== FILE: lib/presentation/screens/calendar/calendar_screen.dart ===
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/enums.dart';
+import '../../providers/calendar_providers.dart';
+import '../today/widgets/intake_card.dart'; // РџРµСЂРµРёСЃРїРѕР»СЊР·СѓРµРј РєР°СЂС‚РѕС‡РєСѓ РёР· "РЎРµРіРѕРґРЅСЏ"
+
+class CalendarScreen extends ConsumerStatefulWidget {
+  const CalendarScreen({super.key});
+
+  @override
+  ConsumerState<CalendarScreen> createState() => _CalendarScreenState();
+}
+
+class _CalendarScreenState extends ConsumerState<CalendarScreen> {
+  late DateTime _focusedMonth;
+  late DateTime _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _focusedMonth = DateTime(now.year, now.month, 1);
+    _selectedDate = DateTime(now.year, now.month, now.day);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final intakesAsync = ref.watch(monthIntakesProvider(_focusedMonth));
+
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(title: const Text('РљР°Р»РµРЅРґР°СЂСЊ')),
+      body: Column(
+        children: [
+          // 1. РЁР°РїРєР° СЃ РїРµСЂРµРєР»СЋС‡РµРЅРёРµРј РјРµСЃСЏС†РµРІ
+          _buildMonthHeader(),
+
+          // 2. РЎРµС‚РєР° РєР°Р»РµРЅРґР°СЂСЏ (Р·Р°РІРёСЃРёС‚ РѕС‚ РґР°РЅРЅС‹С…)
+          intakesAsync.when(
+            loading: () => const SizedBox(
+              height: 300,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => SizedBox(
+              height: 300,
+              child: Center(child: Text('РћС€РёР±РєР°: $e')),
+            ),
+            data: (intakes) => _buildCalendarGrid(intakes),
+          ),
+
+          const Divider(height: 1),
+
+          // 3. РЎРїРёСЃРѕРє РїСЂРёС‘РјРѕРІ РЅР° РІС‹Р±СЂР°РЅРЅС‹Р№ РґРµРЅСЊ
+          Expanded(
+            child: intakesAsync.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (intakes) {
+                final selectedDayIntakes = intakes.where((i) {
+                  return i.plannedAt.year == _selectedDate.year &&
+                      i.plannedAt.month == _selectedDate.month &&
+                      i.plannedAt.day == _selectedDate.day;
+                }).toList();
+
+                if (selectedDayIntakes.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'РќР° СЌС‚РѕС‚ РґРµРЅСЊ РїСЂРёС‘РјРѕРІ РЅРµС‚',
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: selectedDayIntakes.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) {
+                    // РђРґР°РїС‚РёСЂСѓРµРј CalendarIntake РїРѕРґ РІРёРґР¶РµС‚ TodayIntake
+                    final item = selectedDayIntakes[i];
+                    return Container(
+                      color: Colors.transparent, // Р”Р»СЏ РїСЂР°РІРёР»СЊРЅРѕРіРѕ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+                      child: _buildAdaptedCard(item, ref),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // в”Ђв”Ђв”Ђ Р’РёРґР¶РµС‚ С€Р°РїРєРё РјРµСЃСЏС†Р° в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  Widget _buildMonthHeader() {
+    const months = [
+      'РЇРЅРІР°СЂСЊ', 'Р¤РµРІСЂР°Р»СЊ', 'РњР°СЂС‚', 'РђРїСЂРµР»СЊ', 'РњР°Р№', 'РСЋРЅСЊ',
+      'РСЋР»СЊ', 'РђРІРіСѓСЃС‚', 'РЎРµРЅС‚СЏР±СЂСЊ', 'РћРєС‚СЏР±СЂСЊ', 'РќРѕСЏР±СЂСЊ', 'Р”РµРєР°Р±СЂСЊ'
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () {
+              setState(() {
+                _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1, 1);
+              });
+            },
+          ),
+          Text(
+            '${months[_focusedMonth.month - 1]} ${_focusedMonth.year}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          IconButton(
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () {
+              setState(() {
+                _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 1);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // в”Ђв”Ђв”Ђ Р’РёРґР¶РµС‚ СЃРµС‚РєРё РєР°Р»РµРЅРґР°СЂСЏ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+  Widget _buildCalendarGrid(List<CalendarIntake> intakes) {
+    // Р’С‹С‡РёСЃР»СЏРµРј, СЃРєРѕР»СЊРєРѕ РґРЅРµР№ РІ РјРµСЃСЏС†Рµ Рё СЃ РєР°РєРѕРіРѕ РґРЅСЏ РЅРµРґРµР»Рё РѕРЅ РЅР°С‡РёРЅР°РµС‚СЃСЏ
+    final daysInMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
+    // weekday: 1 = РџРЅ, 7 = Р’СЃ. РќР°Рј РЅСѓР¶РЅРѕ СЃРјРµС‰РµРЅРёРµ, РіРґРµ РџРЅ = 0, Р’СЃ = 6
+    final firstWeekday = DateTime(_focusedMonth.year, _focusedMonth.month, 1).weekday - 1;
+
+    const weekDays = ['РџРЅ', 'Р’С‚', 'РЎСЂ', 'Р§С‚', 'РџС‚', 'РЎР±', 'Р’СЃ'];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          // Р”РЅРё РЅРµРґРµР»Рё
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekDays.map((d) => Text(
+              d,
+              style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600),
+            )).toList(),
+          ),
+          const SizedBox(height: 8),
+          // РЎРµС‚РєР° С‡РёСЃРµР»
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: daysInMonth + firstWeekday,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              childAspectRatio: 1.0,
+            ),
+            itemBuilder: (context, index) {
+              if (index < firstWeekday) {
+                return const SizedBox.shrink(); // РџСѓСЃС‚С‹Рµ РєР»РµС‚РєРё РґРѕ 1-РіРѕ С‡РёСЃР»Р°
+              }
+
+              final dayNumber = index - firstWeekday + 1;
+              final date = DateTime(_focusedMonth.year, _focusedMonth.month, dayNumber);
+
+              // Р•СЃС‚СЊ Р»Рё РїСЂРёС‘РјС‹ РІ СЌС‚РѕС‚ РґРµРЅСЊ?
+              final hasIntakes = intakes.any((i) =>
+              i.plannedAt.year == date.year &&
+                  i.plannedAt.month == date.month &&
+                  i.plannedAt.day == date.day);
+
+              // Р’С‹Р±СЂР°РЅ Р»Рё СЌС‚РѕС‚ РґРµРЅСЊ?
+              final isSelected = date.year == _selectedDate.year &&
+                  date.month == _selectedDate.month &&
+                  date.day == _selectedDate.day;
+
+              return GestureDetector(
+                onTap: () => setState(() => _selectedDate = date),
+                child: Container(
+                  margin: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppTheme.accentBlue : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Text(
+                        '$dayNumber',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      if (hasIntakes && !isSelected)
+                        Positioned(
+                          bottom: 4,
+                          child: Container(
+                            width: 4,
+                            height: 4,
+                            decoration: const BoxDecoration(
+                              color: AppTheme.accentBlue,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // РђРґР°РїС‚РµСЂ РґР»СЏ РїРµСЂРµРёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ IntakeCard
+  Widget _buildAdaptedCard(CalendarIntake item, WidgetRef ref) {
+    // Р§С‚РѕР±С‹ РЅРµ РїРµСЂРµРїРёСЃС‹РІР°С‚СЊ IntakeCard, РјС‹ РјРѕР¶РµРј РѕР±РµСЂРЅСѓС‚СЊ РµРіРѕ РёР»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ
+    // РЅР°РїСЂСЏРјСѓСЋ, РµСЃР»Рё СЃС‚СЂСѓРєС‚СѓСЂР° РґР°РЅРЅС‹С… СЃРѕРІРїР°РґР°РµС‚.
+    // Р’ РЅР°С€РµРј СЃР»СѓС‡Р°Рµ TodayIntake Рё CalendarIntake РёРјРµСЋС‚ РѕРґРёРЅР°РєРѕРІС‹Рµ РіРµС‚С‚РµСЂС‹.
+    // Р”Р»СЏ РїСЂРѕСЃС‚РѕС‚С‹, СЃРєРѕРїРёСЂСѓРµРј Р»РѕРіРёРєСѓ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РєР°СЂС‚РѕС‡РєРё РёР· TodayScreen.
+
+    // Р’РђР–РќРћ: Р’ СЂРµР°Р»СЊРЅРѕРј РїСЂРѕРµРєС‚Рµ Р»СѓС‡С€Рµ РІС‹РЅРµСЃС‚Рё РєР°СЂС‚РѕС‡РєСѓ РІ РѕР±С‰РёР№ РІРёРґР¶РµС‚,
+    // РїСЂРёРЅРёРјР°СЋС‰РёР№ Р°Р±СЃС‚СЂР°РєС‚РЅС‹Р№ РёРЅС‚РµСЂС„РµР№СЃ.
+    // Р—РґРµСЃСЊ РјС‹ РїСЂРѕСЃС‚Рѕ СЃРѕР·РґР°РґРёРј РІРёР·СѓР°Р»СЊРЅСѓСЋ РєРѕРїРёСЋ РґР»СЏ РєР°Р»РµРЅРґР°СЂСЏ.
+
+    return _CalendarCard(item: item);
+  }
+}
+
+// РЈРїСЂРѕС‰С‘РЅРЅР°СЏ РєРѕРїРёСЏ IntakeCard РґР»СЏ РєР°Р»РµРЅРґР°СЂСЏ
+class _CalendarCard extends ConsumerWidget {
+  final CalendarIntake item;
+  const _CalendarCard({required this.item});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppTheme.accentBlue.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.medication, color: AppTheme.accentBlue),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.dosage == null ? item.medicationName : '${item.medicationName} ${item.dosage}',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${item.plannedAt.hour.toString().padLeft(2, '0')}:${item.plannedAt.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+          _buildStatusBadge(item.status),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(IntakeStatus status) {
+    Color color;
+    String text;
+    switch (status) {
+      case IntakeStatus.taken:
+        color = AppTheme.statusTaken;
+        text = 'РџСЂРёРЅСЏС‚Рѕ';
+      case IntakeStatus.skipped:
+        color = AppTheme.statusSkipped;
+        text = 'РџСЂРѕРїСѓС‰РµРЅРѕ';
+      case IntakeStatus.postponed:
+        color = AppTheme.statusPostponed;
+        text = 'РћС‚Р»РѕР¶РµРЅРѕ';
+      case IntakeStatus.pending:
+        color = AppTheme.statusPending;
+        text = 'РћР¶РёРґР°РµС‚СЃСЏ';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12),
+      ),
+    );
+  }
+}
+
+=== FILE: lib/presentation/screens/medications/medications_screen.dart ===
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../../domain/entities/enums.dart';
+import '../../providers/medications_providers.dart';
+import '../add_medication/add_medication_screen.dart';
+
+class MedicationsScreen extends ConsumerWidget {
+  const MedicationsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final medsAsync = ref.watch(medicationsProvider);
+
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: const Text('Р›РµРєР°СЂСЃС‚РІР°'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const AddMedicationScreen(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: medsAsync.when(
+        data: (meds) {
+          if (meds.isEmpty) {
+            return const Center(
+              child: Text(
+                'РџРѕРєР° РЅРµС‚ Р»РµРєР°СЂСЃС‚РІ.\nРќР°Р¶РјРёС‚Рµ В«+В», С‡С‚РѕР±С‹ РґРѕР±Р°РІРёС‚СЊ.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.black54),
+              ),
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: meds.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (_, i) => _MedicationTile(medication: meds[i]),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('РћС€РёР±РєР°: $e')),
+      ),
+    );
+  }
+}
+
+class _MedicationTile extends ConsumerWidget {
+  final dynamic medication;
+  const _MedicationTile({required this.medication});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppTheme.accentBlue.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _iconForForm(medication.form),
+              color: AppTheme.accentBlue,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  medication.dosage == null
+                      ? medication.name
+                      : '${medication.name} ${medication.dosage}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _formatDateRange(medication.startDate, medication.endDate),
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            onPressed: () => _confirmDelete(context, ref),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('РЈРґР°Р»РёС‚СЊ Р»РµРєР°СЂСЃС‚РІРѕ?'),
+        content: Text('В«${medication.name}В» Р±СѓРґРµС‚ СѓРґР°Р»РµРЅРѕ РІРјРµСЃС‚Рµ СЃ СЂР°СЃРїРёСЃР°РЅРёРµРј.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('РћС‚РјРµРЅР°'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('РЈРґР°Р»РёС‚СЊ', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) {
+      await ref.read(medicationsProvider.notifier).delete(medication.id!);
+    }
+  }
+
+  IconData _iconForForm(MedicationForm form) {
+    switch (form) {
+      case MedicationForm.tablet:
+        return Icons.medication;
+      case MedicationForm.capsule:
+        return Icons.medication_liquid;
+      case MedicationForm.syrup:
+        return Icons.sanitizer;
+      case MedicationForm.injection:
+        return Icons.vaccines;
+      case MedicationForm.drops:
+        return Icons.water_drop;
+      case MedicationForm.other:
+        return Icons.medical_services;
+    }
+  }
+
+  String _formatDateRange(DateTime start, DateTime? end) {
+    String fmt(DateTime d) => '${d.day}.${d.month}.${d.year}';
+    if (end == null) return 'СЃ ${fmt(start)}';
+    return '${fmt(start)} вЂ” ${fmt(end)}';
+  }
+}
+
+=== FILE: lib/presentation/screens/settings/settings_screen.dart ===
+import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_theme.dart';
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: const Text('РќР°СЃС‚СЂРѕР№РєРё'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _section('РџСЂРѕС„РёР»СЊ'),
+          _tile(Icons.person_outline, 'РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ', 'РђРЅРЅР°'),
+          const SizedBox(height: 16),
+
+          _section('РќР°РїРѕРјРёРЅР°РЅРёСЏ'),
+          _tile(Icons.notifications_outlined, 'Р—РІСѓРє СѓРІРµРґРѕРјР»РµРЅРёР№', 'Р’РєР»'),
+          _tile(Icons.vibration, 'Р’РёР±СЂР°С†РёСЏ', 'Р’РєР»'),
+          const SizedBox(height: 16),
+
+          _section('Р‘РµР·РѕРїР°СЃРЅРѕСЃС‚СЊ'),
+          _tile(Icons.lock_outline, 'PIN-РєРѕРґ', 'Р’С‹РєР»'),
+          _tile(Icons.fingerprint, 'Р‘РёРѕРјРµС‚СЂРёСЏ', 'Р’С‹РєР»'),
+          const SizedBox(height: 16),
+
+          _section('Р”Р°РЅРЅС‹Рµ'),
+          _tile(Icons.file_download_outlined, 'Р­РєСЃРїРѕСЂС‚ РѕС‚С‡С‘С‚Р°', null),
+          _tile(Icons.info_outline, 'Рћ РїСЂРёР»РѕР¶РµРЅРёРё', 'v0.1.0'),
+        ],
+      ),
+    );
+  }
+
+  Widget _section(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.black54,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  Widget _tile(IconData icon, String title, String? trailing) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: AppTheme.accentBlue),
+        title: Text(title, style: const TextStyle(fontSize: 16)),
+        trailing: trailing == null
+            ? const Icon(Icons.chevron_right, color: Colors.black26)
+            : Text(
+          trailing,
+          style: const TextStyle(color: Colors.black54, fontSize: 15),
+        ),
+        onTap: () {},
+      ),
+    );
+  }
+}
+
+=== FILE: lib/presentation/screens/today/widgets/intake_card.dart ===
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/theme/app_theme.dart';
+import '../../../../domain/entities/enums.dart';
+import '../../../providers/repository_providers.dart';
+import '../../../providers/today_providers.dart';
+import '../../../providers/calendar_providers.dart';
+
+class IntakeCard extends ConsumerWidget {
+  final TodayIntake item;
+
+  const IntakeCard({super.key, required this.item});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.cardWhite,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          // РРєРѕРЅРєР° С„РѕСЂРјС‹
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: _iconColor(item.medication.form).withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _iconForForm(item.medication.form),
+              color: _iconColor(item.medication.form),
+              size: 22,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // РќР°Р·РІР°РЅРёРµ + РІСЂРµРјСЏ
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.dosage == null
+                      ? item.medicationName
+                      : '${item.medicationName} ${item.dosage}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _formatTime(item.plannedAt),
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+              ],
+            ),
+          ),
+
+          // РљРЅРѕРїРєР° / СЃС‚Р°С‚СѓСЃ
+          _buildStatusOrButton(context, ref),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusOrButton(BuildContext context, WidgetRef ref) {
+    switch (item.status) {
+      case IntakeStatus.taken:
+        return GestureDetector(
+          onTap: () => _showUndoDialog(context, ref),
+          child: const _StatusBadge(
+            text: 'РџСЂРёРЅСЏС‚Рѕ',
+            color: AppTheme.statusTaken,
+          ),
+        );
+      case IntakeStatus.skipped:
+        return const _StatusBadge(
+          text: 'РџСЂРѕРїСѓС‰РµРЅРѕ',
+          color: AppTheme.statusSkipped,
+        );
+      case IntakeStatus.postponed:
+        return const _StatusBadge(
+          text: 'РћС‚Р»РѕР¶РµРЅРѕ',
+          color: AppTheme.statusPostponed,
+        );
+      case IntakeStatus.pending:
+        return ElevatedButton(
+          onPressed: () async {
+            final repo = ref.read(intakeRepositoryProvider);
+            await repo.markTaken(item.intake.id!, DateTime.now());
+
+            // РћР±РЅРѕРІР»СЏРµРј РґР°РЅРЅС‹Рµ
+            ref.invalidate(todayIntakesProvider);
+            ref.invalidate(monthIntakesProvider);
+
+            // РџРѕРєР°Р·С‹РІР°РµРј SnackBar СЃ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊСЋ РѕС‚РјРµРЅС‹
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Р›РµРєР°СЂСЃС‚РІРѕ РѕС‚РјРµС‡РµРЅРѕ РєР°Рє РїСЂРёРЅСЏС‚РѕРµ'),
+                  action: SnackBarAction(
+                    label: 'РћС‚РјРµРЅРёС‚СЊ',
+                    onPressed: () async {
+                      await repo.markPending(item.intake.id!);
+                      ref.invalidate(todayIntakesProvider);
+                      ref.invalidate(monthIntakesProvider);
+                    },
+                  ),
+                ),
+              );
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.statusTaken,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+          child: const Text('РџСЂРёРЅСЏР»', style: TextStyle(fontSize: 14)),
+        );
+    }
+  }
+
+  // Р”РёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ РґР»СЏ РѕС‚РјРµРЅС‹ СЃР»СѓС‡Р°Р№РЅРѕРіРѕ РЅР°Р¶Р°С‚РёСЏ
+  Future<void> _showUndoDialog(BuildContext context, WidgetRef ref) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('РћС‚РјРµРЅРёС‚СЊ РїСЂРёС‘Рј?'),
+        content: const Text('Р’РµСЂРЅСѓС‚СЊ СЃС‚Р°С‚СѓСЃ РІ В«РћР¶РёРґР°РµС‚СЃСЏВ»?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('РќРµС‚'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Р”Р°, РѕС‚РјРµРЅРёС‚СЊ'),
+          ),
+        ],
+      ),
+    );
+
+    if (ok == true) {
+      final repo = ref.read(intakeRepositoryProvider);
+      await repo.markPending(item.intake.id!);
+      ref.invalidate(todayIntakesProvider);
+      ref.invalidate(monthIntakesProvider);
+    }
+  }
+
+  IconData _iconForForm(MedicationForm form) {
+    switch (form) {
+      case MedicationForm.tablet:
+        return Icons.medication;
+      case MedicationForm.capsule:
+        return Icons.medication_liquid;
+      case MedicationForm.syrup:
+        return Icons.sanitizer;
+      case MedicationForm.injection:
+        return Icons.vaccines;
+      case MedicationForm.drops:
+        return Icons.water_drop;
+      case MedicationForm.other:
+        return Icons.medical_services;
+    }
+  }
+
+  Color _iconColor(MedicationForm form) {
+    switch (form) {
+      case MedicationForm.tablet:
+        return const Color(0xFF3B82F6);
+      case MedicationForm.capsule:
+        return const Color(0xFFEF4444);
+      case MedicationForm.syrup:
+        return const Color(0xFFF59E0B);
+      case MedicationForm.injection:
+        return const Color(0xFF8B5CF6);
+      case MedicationForm.drops:
+        return const Color(0xFF10B981);
+      case MedicationForm.other:
+        return const Color(0xFF6B7280);
+    }
+  }
+
+  String _formatTime(DateTime dt) {
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    return '$h:$m';
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String text;
+  final Color color;
+
+  const _StatusBadge({required this.text, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+}
+
+=== FILE: lib/presentation/screens/today/today_screen.dart ===
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/theme/app_theme.dart';
+import '../../providers/today_providers.dart';
+import 'widgets/intake_card.dart';
+import '../add_medication/add_medication_screen.dart';
+
+
+class TodayScreen extends ConsumerWidget {
+  const TodayScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todayAsync = ref.watch(todayIntakesProvider);
+
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => const AddMedicationScreen(),
+            ),
+          );
+        },
+        backgroundColor: AppTheme.accentBlue,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+
+              // РџСЂРёРІРµС‚СЃС‚РІРёРµ
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 26,
+                    backgroundColor: AppTheme.accentBlue.withValues(alpha: 0.15),
+                    child: const Icon(Icons.person, color: AppTheme.accentBlue),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Р”РѕР±СЂРѕРµ СѓС‚СЂРѕ!',
+                      style: TextStyle(fontSize: 18, color: Colors.black54),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Р”Р°С‚Р°
+              Text(
+                _formatDate(DateTime.now()),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+
+              const SizedBox(height: 16),
+
+              // РЎРїРёСЃРѕРє РїСЂРёС‘РјРѕРІ
+              Expanded(
+                child: todayAsync.when(
+                  data: (items) {
+                    if (items.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'РќР° СЃРµРіРѕРґРЅСЏ РїСЂРёС‘РјРѕРІ РЅРµС‚',
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                        ),
+                      );
+                    }
+                    return ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      itemCount: items.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (_, i) => IntakeCard(item: items[i]),
+                    );
+                  },
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (e, _) => Center(child: Text('РћС€РёР±РєР°: $e')),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'СЏРЅРІР°СЂСЏ', 'С„РµРІСЂР°Р»СЏ', 'РјР°СЂС‚Р°', 'Р°РїСЂРµР»СЏ', 'РјР°СЏ', 'РёСЋРЅСЏ',
+      'РёСЋР»СЏ', 'Р°РІРіСѓСЃС‚Р°', 'СЃРµРЅС‚СЏР±СЂСЏ', 'РѕРєС‚СЏР±СЂСЏ', 'РЅРѕСЏР±СЂСЏ', 'РґРµРєР°Р±СЂСЏ',
+    ];
+    const weekdays = [
+      'РџРѕРЅРµРґРµР»СЊРЅРёРє', 'Р’С‚РѕСЂРЅРёРє', 'РЎСЂРµРґР°', 'Р§РµС‚РІРµСЂРі',
+      'РџСЏС‚РЅРёС†Р°', 'РЎСѓР±Р±РѕС‚Р°', 'Р’РѕСЃРєСЂРµСЃРµРЅСЊРµ',
+    ];
+    final wd = weekdays[date.weekday - 1];
+    final d = date.day;
+    final m = months[date.month - 1];
+    return '$wd, $d $m';
+  }
+}
+
+=== FILE: lib/presentation/screens/main_screen.dart ===
+import 'package:flutter/material.dart';
+
+import '../../core/theme/app_theme.dart';
+import 'calendar/calendar_screen.dart';
+import 'medications/medications_screen.dart';
+import 'settings/settings_screen.dart';
+import 'today/today_screen.dart';
+
+/// РљРѕСЂРЅРµРІРѕР№ СЌРєСЂР°РЅ СЃ РЅРёР¶РЅРµР№ РЅР°РІРёРіР°С†РёРµР№.
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _index = 0;
+
+  static const _screens = [
+    TodayScreen(),
+    MedicationsScreen(),
+    CalendarScreen(),
+    SettingsScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: IndexedStack(
+        index: _index,
+        children: _screens,
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (i) => setState(() => _index = i),
+        backgroundColor: Colors.white,
+        indicatorColor: AppTheme.accentBlue.withValues(alpha: 0.15),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home, color: AppTheme.accentBlue),
+            label: 'РЎРµРіРѕРґРЅСЏ',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.medication_outlined),
+            selectedIcon: Icon(Icons.medication, color: AppTheme.accentBlue),
+            label: 'Р›РµРєР°СЂСЃС‚РІР°',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month, color: AppTheme.accentBlue),
+            label: 'РљР°Р»РµРЅРґР°СЂСЊ',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings, color: AppTheme.accentBlue),
+            label: 'РќР°СЃС‚СЂРѕР№РєРё',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+=== FILE: lib/app.dart ===
+import 'package:flutter/material.dart';
+
+import 'core/theme/app_theme.dart';
+import 'presentation/screens/main_screen.dart';
+
+class TabletkaApp extends StatelessWidget {
+  const TabletkaApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'РўР°Р±Р»РµС‚РѕС‡РЅРёС†Р°',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      home: const MainScreen(),
+    );
+  }
+}
+
+=== FILE: lib/main.dart ===
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'app.dart';
+
+void main() {
+  runApp(const ProviderScope(child: TabletkaApp()));
+}
