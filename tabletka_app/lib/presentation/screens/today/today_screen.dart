@@ -1,17 +1,79 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../../core/theme/app_theme.dart';
-import '../../../core/services/settings_service.dart';
 import '../../providers/settings_providers.dart';
 import '../../providers/today_providers.dart';
 import 'widgets/intake_card.dart';
 import '../add_medication/add_medication_screen.dart';
 
-class TodayScreen extends ConsumerWidget {
+class TodayScreen extends ConsumerStatefulWidget {
   const TodayScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TodayScreen> createState() => _TodayScreenState();
+}
+
+class _TodayScreenState extends ConsumerState<TodayScreen> {
+  late Timer _timer;
+  String greeting = _getGreeting();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      final newGreeting = _getGreeting();
+
+      if (newGreeting != greeting) {
+        setState(() {
+          greeting = newGreeting;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  static String _getGreeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour >= 5 && hour < 12) {
+      return 'Доброе утро';
+    } else if (hour >= 12 && hour < 18) {
+      return 'Добрый день';
+    } else if (hour >= 18 && hour < 23) {
+      return 'Добрый вечер';
+    } else {
+      return 'Доброй ночи';
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'января', 'февраля', 'марта', 'апреля',
+      'мая', 'июня', 'июля', 'августа',
+      'сентября', 'октября', 'ноября', 'декабря',
+    ];
+
+    const weekdays = [
+      'Понедельник', 'Вторник', 'Среда',
+      'Четверг', 'Пятница', 'Суббота',
+      'Воскресенье',
+    ];
+
+    return '${weekdays[date.weekday - 1]}, '
+        '${date.day} ${months[date.month - 1]}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final todayAsync = ref.watch(todayIntakesProvider);
     final nameAsync = ref.watch(userNameProvider);
 
@@ -36,7 +98,6 @@ class TodayScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
-
               Row(
                 children: [
                   CircleAvatar(
@@ -52,28 +113,24 @@ class TodayScreen extends ConsumerWidget {
                   Expanded(
                     child: nameAsync.when(
                       data: (name) => Text(
-                        'Доброе утро, $name!',
+                        '$greeting, $name!',
                         style: const TextStyle(
                           fontSize: 18,
                           color: Colors.black54,
                         ),
                       ),
-                      loading: () => const Text('Доброе утро!'),
-                      error: (_, __) => const Text('Доброе утро!'),
+                      loading: () => Text('$greeting!'),
+                      error: (_, __) => Text('$greeting!'),
                     ),
                   ),
                 ],
               ),
-
               const SizedBox(height: 16),
-
               Text(
                 _formatDate(DateTime.now()),
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
-
               const SizedBox(height: 16),
-
               Expanded(
                 child: todayAsync.when(
                   data: (items) {
@@ -111,22 +168,5 @@ class TodayScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'января', 'февраля', 'марта', 'апреля',
-      'мая', 'июня', 'июля', 'августа',
-      'сентября', 'октября', 'ноября', 'декабря',
-    ];
-
-    const weekdays = [
-      'Понедельник', 'Вторник', 'Среда',
-      'Четверг', 'Пятница', 'Суббота',
-      'Воскресенье',
-    ];
-
-    return '${weekdays[date.weekday - 1]}, '
-        '${date.day} ${months[date.month - 1]}';
   }
 }
