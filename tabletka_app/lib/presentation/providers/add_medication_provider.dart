@@ -67,7 +67,14 @@ Future<int> addMedicationWithSchedule({
 
    
     for (final intake in intakesForDay) {
-      await intakeRepo.add(intake);
+      final intakeId = await intakeRepo.add(intake);
+
+      await NotificationService.scheduleForIntake(
+        intakeId: intakeId,
+        plannedAt: intake.plannedAt,
+        medicationName: name,
+        dosage: dosage,
+      );
     }
   }
 
