@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../core/services/notification_service.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/intake.dart';
 import '../../domain/entities/medication.dart';
 import '../../domain/entities/schedule.dart';
 import '../../domain/usecases/generate_intakes.dart';
 import 'repository_providers.dart';
+import '../../core/services/notification_service.dart';
 
 /// Добавляет лекарство + расписание + генерирует приёмы на сегодня.
 ///
@@ -64,6 +65,7 @@ Future<int> addMedicationWithSchedule({
       scheduleStartDate: startDate,
     );
 
+   
     for (final intake in intakesForDay) {
       await intakeRepo.add(intake);
     }

@@ -2,10 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/entities/medication.dart';
 import 'repository_providers.dart';
+import 'calendar_providers.dart';
 
 /// Провайдер списка лекарств с поддержкой удаления.
 final medicationsProvider =
-AsyncNotifierProvider<MedicationsNotifier, List<Medication>>(
+    AsyncNotifierProvider<MedicationsNotifier, List<Medication>>(
   MedicationsNotifier.new,
 );
 
@@ -26,7 +27,13 @@ class MedicationsNotifier extends AsyncNotifier<List<Medication>> {
 
   Future<void> delete(int id) async {
     final repo = ref.read(medicationRepositoryProvider);
+
     await repo.delete(id);
+
+    // Обновляем список лекарств.
     await refresh();
+
+    // Обновляем данные календаря.
+    ref.invalidate(monthIntakesProvider);
   }
 }
