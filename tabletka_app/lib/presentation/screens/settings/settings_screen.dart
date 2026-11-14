@@ -11,6 +11,11 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/services/settings_service.dart';
 import '../../providers/database_provider.dart';
 
+import 'package:cross_file/cross_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+
+
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -262,76 +267,109 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   // Экспорт отчёта
-  Future<void> _exportReport() async {
-    if (_exporting) return;
+  
+Future<void> _exportReport() async {
+  if (_exporting) return;
 
-    setState(() => _exporting = true);
+  setState(() => _exporting = true);
 
-    try {
-      final database = ref.read(databaseProvider);
+  try {
+    final database = ref.read(databaseProvider);
 
-      final intakes = await database.select(database.intakes).get();
-      final medications = await database.select(database.medications).get();
+    final intakes = await database.select(database.intakes).get();
+    final medications = await database.select(database.medications).get();
 
-      final medicationMap = {
-        for (final medication in medications)
-          medication.id: medication,
-      };
+    final medicationMap = {
+      for (final medication in medications)
+        medication.id: medication,
+    };
 
-      final rows = <List<String>>[
-        [
-          'Лекарство',
-          'Дозировка',
-          'Запланировано',
-          'Фактически принято',
-          'Статус',
-        ],
-      ];
+    final rows = <List<String>>[
+      [
+        'Лекарство',
+        'Дозировка',
+        'Запланировано',
+        'Фактически принято',
+        'Статус',
+      ],
+    ];
 
-      for (final intake in intakes) {
-        final medication = medicationMap[intake.medicationId];
+    for (final intake in intakes) {
+      final medication = medicationMap[intake.medicationId];
 
-        String status;
+      String status;
 
-        switch (intake.status.name) {
-          case 'taken':
-            status = 'Принято';
-            break;
-          case 'skipped':
-            status = 'Пропущено';
-            break;
-          case 'postponed':
-            status = 'Отложено';
-            break;
-          default:
-            status = 'Ожидается';
-        }
-
-        rows.add([
-          medication?.name ?? 'Неизвестное лекарство',
-          medication?.dosage ?? '',
-          _formatDate(intake.plannedAt),
-          intake.takenAt == null
-              ? ''
-              : _formatDate(intake.takenAt!),
-          status,
-        ]);
+      switch (intake.status.name) {
+        case 'taken':
+          status = 'Принято';
+          break;
+        case 'skipped':
+          status = 'Пропущено';
+          break;
+        case 'postponed':
+          status = 'Отложено';
+          break;
+        default:
+          status = 'Ожидается';
       }
 
-      final csv = rows.map((row) {
-        return row.map((value) {
-          final escaped = value.replaceAll('"', '""');
+      rows.add([
+        medication?.name ?? 'Неизвестное лекарство',
+        medication?.dosage ?? '',
+        _formatDate(intake.plannedAt),
+        intake.takenAt == null
+            ? ''
+            : _formatDate(intake.takenAt!),
+        status,
+      ]);
+    }
 
-          if (escaped.contains(';') ||
-              escaped.contains('"') ||
-              escaped.contains('\n')) {
-            return '"$escaped"';
-          }
+    final csv = rows.map((row) {
+      return row.map((value) {
+        final escaped = value.replaceAll('"', '""');
 
-          return escaped;
-        }).join(';');
-      }).join('\r\n');
+        if (escaped.contains(';') ||
+            escaped.contains('"') ||
+            escaped.contains('\n')) {
+          return '"$escaped"';
+        }
 
+        return escaped;
+      }).join(';');
+    }).join('\r\n');
+
+    final bytes = [
+      0xEF,
+      0xBB,
+      0xBF,
+      ...utf8.encode(csv),
+    ];
+
+    // Android: создаём временный файл и открываем меню отправки.
+    if (Platform.isAndroid) {
+      final directory = await getTemporaryDirectory();
+
+      final file = File(
+        '${directory.path}${Platform.pathSeparator}tabletka_report.csv',
+      );
+
+      await file.writeAsBytes(bytes, flush: true);
+
+      await SharePlus.instance.share(
+        ShareParams(
+          title: 'Экспорт отчёта',
+          subject: 'Отчёт о приёме лекарств',
+          files: [
+            XFile(file.path, mimeType: 'text/csv'),
+          ],
+        ),
+      );
+
+      if (!mounted) return;
+
+      _message('Выберите приложение для сохранения или открытия отчёта');
+    } else {
+      // Windows: оставляем привычное окно выбора места сохранения.
       final location = await getSaveLocation(
         suggestedName: 'tabletka_report.csv',
         acceptedTypeGroups: [
@@ -345,27 +383,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (location == null) return;
 
       await File(location.path).writeAsBytes(
-        [
-          0xEF,
-          0xBB,
-          0xBF,
-          ...utf8.encode(csv),
-        ],
+        bytes,
+        flush: true,
       );
 
       if (!mounted) return;
 
       _message('Отчёт успешно сохранён');
-    } catch (e) {
-      if (mounted) {
-        _message('Ошибка экспорта: $e');
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _exporting = false);
-      }
+    }
+  } catch (e) {
+    if (mounted) {
+      _message('Ошибка экспорта: $e');
+    }
+  } finally {
+    if (mounted) {
+      setState(() => _exporting = false);
     }
   }
+}
+
 
   String _formatDate(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
