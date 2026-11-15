@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/enums.dart';
 import '../../providers/calendar_providers.dart';
-import '../today/widgets/intake_card.dart'; // Переиспользуем карточку из "Сегодня"
+import '../../widgets/app_widgets.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -17,6 +17,21 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late DateTime _focusedMonth;
   late DateTime _selectedDate;
 
+  static const _monthsNominative = [
+    'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',
+  ];
+
+  static const _monthsGenitive = [
+    'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
+  ];
+
+  static const _weekdaysFull = [
+    'понедельник', 'вторник', 'среда', 'четверг',
+    'пятница', 'суббота', 'воскресенье',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -25,196 +40,130 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     _selectedDate = DateTime(now.year, now.month, now.day);
   }
 
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
+
+  bool get _isOnToday {
+    final now = DateTime.now();
+    return _focusedMonth.year == now.year &&
+        _focusedMonth.month == now.month &&
+        _isSameDay(_selectedDate, now);
+  }
+
+  void _changeMonth(int delta) {
+    final next = DateTime(_focusedMonth.year, _focusedMonth.month + delta, 1);
+    final now = DateTime.now();
+    setState(() {
+      _focusedMonth = next;
+      // В текущем месяце выбираем сегодня, в остальных — 1-е число,
+      // чтобы список под календарём не оставался пустым.
+      _selectedDate = (next.year == now.year && next.month == now.month)
+          ? DateTime(now.year, now.month, now.day)
+          : next;
+    });
+  }
+
+  void _goToday() {
+    final now = DateTime.now();
+    setState(() {
+      _focusedMonth = DateTime(now.year, now.month, 1);
+      _selectedDate = DateTime(now.year, now.month, now.day);
+    });
+  }
+
+  static String _time(DateTime dt) {
+    final h = dt.hour.toString().padLeft(2, '0');
+    final m = dt.minute.toString().padLeft(2, '0');
+    return '$h:$m';
+  }
+
   @override
   Widget build(BuildContext context) {
     final intakesAsync = ref.watch(monthIntakesProvider(_focusedMonth));
 
     return Scaffold(
       backgroundColor: AppTheme.background,
-      appBar: AppBar(title: const Text('Календарь')),
-      body: Column(
-        children: [
-          // 1. Шапка с переключением месяцев
-          _buildMonthHeader(),
-
-          // 2. Сетка календаря (зависит от данных)
-          intakesAsync.when(
-            loading: () => const SizedBox(
-              height: 300,
-              child: Center(child: CircularProgressIndicator()),
+      appBar: AppBar(
+        title: const Text('Календарь'),
+        actions: [
+          if (!_isOnToday)
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: TextButton.icon(
+                onPressed: _goToday,
+                icon: const Icon(Icons.today_rounded, size: 18),
+                label: const Text('Сегодня'),
+              ),
             ),
-            error: (e, _) => SizedBox(
-              height: 300,
-              child: Center(child: Text('Ошибка: $e')),
-            ),
-            data: (intakes) => _buildCalendarGrid(intakes),
-          ),
-
-          const Divider(height: 1),
-
-          // 3. Список приёмов на выбранный день
-          Expanded(
-            child: intakesAsync.when(
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
-              data: (intakes) {
-                final selectedDayIntakes = intakes.where((i) {
-                  return i.plannedAt.year == _selectedDate.year &&
-                      i.plannedAt.month == _selectedDate.month &&
-                      i.plannedAt.day == _selectedDate.day;
-                }).toList();
-
-                if (selectedDayIntakes.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'На этот день приёмов нет',
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                  );
-                }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: selectedDayIntakes.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (_, i) {
-                    // Адаптируем CalendarIntake под виджет TodayIntake
-                    final item = selectedDayIntakes[i];
-                    return Container(
-                      color: Colors.transparent, // Для правильного отображения
-                      child: _buildAdaptedCard(item, ref),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
         ],
       ),
-    );
-  }
-
-  // ─── Виджет шапки месяца ──────────────────────────────────
-  Widget _buildMonthHeader() {
-    const months = [
-      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: () {
-              setState(() {
-                _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1, 1);
-              });
-            },
-          ),
-          Text(
-            '${months[_focusedMonth.month - 1]} ${_focusedMonth.year}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed: () {
-              setState(() {
-                _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 1);
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ─── Виджет сетки календаря ───────────────────────────────
-  Widget _buildCalendarGrid(List<CalendarIntake> intakes) {
-    // Вычисляем, сколько дней в месяце и с какого дня недели он начинается
-    final daysInMonth = DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
-    // weekday: 1 = Пн, 7 = Вс. Нам нужно смещение, где Пн = 0, Вс = 6
-    final firstWeekday = DateTime(_focusedMonth.year, _focusedMonth.month, 1).weekday - 1;
-
-    const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          // Дни недели
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: weekDays.map((d) => Text(
-              d,
-              style: const TextStyle(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.w600),
-            )).toList(),
-          ),
-          const SizedBox(height: 8),
-          // Сетка чисел
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: daysInMonth + firstWeekday,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1.0,
-            ),
-            itemBuilder: (context, index) {
-              if (index < firstWeekday) {
-                return const SizedBox.shrink(); // Пустые клетки до 1-го числа
-              }
-
-              final dayNumber = index - firstWeekday + 1;
-              final date = DateTime(_focusedMonth.year, _focusedMonth.month, dayNumber);
-
-              // Есть ли приёмы в этот день?
-              final hasIntakes = intakes.any((i) =>
-              i.plannedAt.year == date.year &&
-                  i.plannedAt.month == date.month &&
-                  i.plannedAt.day == date.day);
-
-              // Выбран ли этот день?
-              final isSelected = date.year == _selectedDate.year &&
-                  date.month == _selectedDate.month &&
-                  date.day == _selectedDate.day;
-
-              return GestureDetector(
-                onTap: () => setState(() => _selectedDate = date),
-                child: Container(
-                  margin: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppTheme.accentBlue : Colors.transparent,
-                    shape: BoxShape.circle,
+          // 1. Карточка календаря
+          SoftCard(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
+            child: Column(
+              children: [
+                _buildMonthHeader(),
+                const SizedBox(height: 8),
+                intakesAsync.when(
+                  loading: () => const SizedBox(
+                    height: 300,
+                    child: Center(child: CircularProgressIndicator()),
                   ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Text(
-                        '$dayNumber',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      if (hasIntakes && !isSelected)
-                        Positioned(
-                          bottom: 4,
-                          child: Container(
-                            width: 4,
-                            height: 4,
-                            decoration: const BoxDecoration(
-                              color: AppTheme.accentBlue,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                    ],
+                  error: (e, _) => SizedBox(
+                    height: 300,
+                    child: Center(child: Text('Ошибка: $e')),
                   ),
+                  data: (intakes) => _buildCalendarGrid(intakes),
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 2. Приёмы выбранного дня
+          intakesAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (intakes) {
+              final dayIntakes = intakes
+                  .where((i) => _isSameDay(i.plannedAt, _selectedDate))
+                  .toList()
+                ..sort((a, b) => a.plannedAt.compareTo(b.plannedAt));
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SectionHeader(
+                    title: '${_selectedDate.day} '
+                        '${_monthsGenitive[_selectedDate.month - 1]}',
+                    trailing: _weekdaysFull[_selectedDate.weekday - 1],
+                  ),
+                  if (dayIntakes.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: EmptyState(
+                        icon: Icons.event_available_rounded,
+                        title: 'Свободный день',
+                        message: 'На этот день приёмов нет.',
+                      ),
+                    )
+                  else
+                    for (var i = 0; i < dayIntakes.length; i++) ...[
+                      if (i > 0) const SizedBox(height: 12),
+                      IntakeTile(
+                        form: dayIntakes[i].form,
+                        title: dayIntakes[i].dosage == null
+                            ? dayIntakes[i].medicationName
+                            : '${dayIntakes[i].medicationName} '
+                                '${dayIntakes[i].dosage}',
+                        time: _time(dayIntakes[i].plannedAt),
+                        trailing: StatusPill.of(dayIntakes[i].status),
+                      ),
+                    ],
+                ],
               );
             },
           ),
@@ -223,96 +172,228 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     );
   }
 
-  // Адаптер для переиспользования IntakeCard
-  Widget _buildAdaptedCard(CalendarIntake item, WidgetRef ref) {
-    // Чтобы не переписывать IntakeCard, мы можем обернуть его или использовать
-    // напрямую, если структура данных совпадает.
-    // В нашем случае TodayIntake и CalendarIntake имеют одинаковые геттеры.
-    // Для простоты, скопируем логику отображения карточки из TodayScreen.
-
-    // ВАЖНО: В реальном проекте лучше вынести карточку в общий виджет,
-    // принимающий абстрактный интерфейс.
-    // Здесь мы просто создадим визуальную копию для календаря.
-
-    return _CalendarCard(item: item);
-  }
-}
-
-// Упрощённая копия IntakeCard для календаря
-class _CalendarCard extends ConsumerWidget {
-  final CalendarIntake item;
-  const _CalendarCard({required this.item});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppTheme.accentBlue.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.medication, color: AppTheme.accentBlue),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.dosage == null ? item.medicationName : '${item.medicationName} ${item.dosage}',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${item.plannedAt.hour.toString().padLeft(2, '0')}:${item.plannedAt.minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-              ],
+  // ─── Шапка месяца ─────────────────────────────────────────
+  Widget _buildMonthHeader() {
+    return Row(
+      children: [
+        _NavButton(
+          icon: Icons.chevron_left_rounded,
+          onTap: () => _changeMonth(-1),
+        ),
+        Expanded(
+          child: Text(
+            '${_monthsNominative[_focusedMonth.month - 1]} '
+            '${_focusedMonth.year}',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 19,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.textPrimary,
+              letterSpacing: -0.3,
             ),
           ),
-          _buildStatusBadge(item.status),
-        ],
-      ),
+        ),
+        _NavButton(
+          icon: Icons.chevron_right_rounded,
+          onTap: () => _changeMonth(1),
+        ),
+      ],
     );
   }
 
-  Widget _buildStatusBadge(IntakeStatus status) {
-    Color color;
-    String text;
-    switch (status) {
-      case IntakeStatus.taken:
-        color = AppTheme.statusTaken;
-        text = 'Принято';
-      case IntakeStatus.skipped:
-        color = AppTheme.statusSkipped;
-        text = 'Пропущено';
-      case IntakeStatus.postponed:
-        color = AppTheme.statusPostponed;
-        text = 'Отложено';
-      case IntakeStatus.pending:
-        color = AppTheme.statusPending;
-        text = 'Ожидается';
+  // ─── Сетка дней ───────────────────────────────────────────
+  Widget _buildCalendarGrid(List<CalendarIntake> intakes) {
+    final daysInMonth =
+        DateTime(_focusedMonth.year, _focusedMonth.month + 1, 0).day;
+    // weekday: 1 = Пн, 7 = Вс → смещение, где Пн = 0
+    final firstWeekday =
+        DateTime(_focusedMonth.year, _focusedMonth.month, 1).weekday - 1;
+
+    const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+
+    // Цвет точки для каждого дня месяца.
+    final Map<int, List<CalendarIntake>> byDay = {};
+    for (final i in intakes) {
+      byDay.putIfAbsent(i.plannedAt.day, () => []).add(i);
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
+    Color dotFor(List<CalendarIntake> list) {
+      if (list.any((i) => i.status == IntakeStatus.skipped)) {
+        return AppTheme.statusSkipped;
+      }
+      if (list.every((i) => i.status == IntakeStatus.taken)) {
+        return AppTheme.statusTaken;
+      }
+      return AppTheme.warning;
+    }
+
+    final now = DateTime.now();
+
+    return Column(
+      children: [
+        Row(
+          children: weekDays
+              .map(
+                (d) => Expanded(
+                  child: Center(
+                    child: Text(
+                      d,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppTheme.textSecondary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        ),
+        const SizedBox(height: 6),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: daysInMonth + firstWeekday,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            childAspectRatio: 1.0,
+          ),
+          itemBuilder: (context, index) {
+            if (index < firstWeekday) {
+              return const SizedBox.shrink(); // пустые клетки до 1-го числа
+            }
+
+            final dayNumber = index - firstWeekday + 1;
+            final date = DateTime(
+              _focusedMonth.year,
+              _focusedMonth.month,
+              dayNumber,
+            );
+
+            final dayIntakes = byDay[dayNumber];
+            final isSelected = _isSameDay(date, _selectedDate);
+            final isToday = _isSameDay(date, now);
+
+            Color? bg;
+            Color textColor = AppTheme.textPrimary;
+            if (isSelected) {
+              bg = AppTheme.primary;
+              textColor = Colors.white;
+            } else if (isToday) {
+              bg = AppTheme.primarySoft;
+              textColor = AppTheme.primaryDark;
+            }
+
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => setState(() => _selectedDate = date),
+              child: Container(
+                margin: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: bg,
+                  shape: BoxShape.circle,
+                  boxShadow: isSelected ? AppTheme.glowShadow : null,
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      '$dayNumber',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: (isSelected || isToday)
+                            ? FontWeight.w800
+                            : FontWeight.w500,
+                        color: textColor,
+                      ),
+                    ),
+                    if (dayIntakes != null)
+                      Positioned(
+                        bottom: 6,
+                        child: Container(
+                          width: 5,
+                          height: 5,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.white
+                                : dotFor(dayIntakes),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 10),
+        const _Legend(),
+      ],
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _NavButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppTheme.primarySoft,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: SizedBox(
+          width: 42,
+          height: 42,
+          child: Icon(icon, color: AppTheme.primaryDark, size: 26),
+        ),
       ),
-      child: Text(
-        text,
-        style: TextStyle(color: color, fontWeight: FontWeight.w600, fontSize: 12),
-      ),
+    );
+  }
+}
+
+class _Legend extends StatelessWidget {
+  const _Legend();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget item(Color color, String text) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textSecondary,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 16,
+      runSpacing: 6,
+      children: [
+        item(AppTheme.statusTaken, 'Всё принято'),
+        item(AppTheme.warning, 'Есть ожидающие'),
+        item(AppTheme.statusSkipped, 'Есть пропуски'),
+      ],
     );
   }
 }

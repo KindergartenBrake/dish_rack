@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
@@ -32,8 +31,7 @@ class _AppLockGateState extends State<AppLockGate> {
   bool _checking = false;
   String? _error;
 
-  final TextEditingController _pinController =
-      TextEditingController();
+  final TextEditingController _pinController = TextEditingController();
 
   @override
   void initState() {
@@ -43,7 +41,6 @@ class _AppLockGateState extends State<AppLockGate> {
 
   Future<void> _checkLock() async {
     final hasPin = await SettingsService.hasPin();
-
     if (!mounted) return;
 
     setState(() {
@@ -56,7 +53,6 @@ class _AppLockGateState extends State<AppLockGate> {
     if (_checking) return;
 
     final pin = _pinController.text;
-
     if (pin.isEmpty) {
       setState(() => _error = 'Введите PIN-код');
       return;
@@ -68,7 +64,6 @@ class _AppLockGateState extends State<AppLockGate> {
     });
 
     final correct = await SettingsService.verifyPin(pin);
-
     if (!mounted) return;
 
     setState(() => _checking = false);
@@ -80,9 +75,7 @@ class _AppLockGateState extends State<AppLockGate> {
       });
     } else {
       _pinController.clear();
-      setState(() {
-        _error = 'Неверный PIN-код';
-      });
+      setState(() => _error = 'Неверный PIN-код');
     }
   }
 
@@ -96,56 +89,85 @@ class _AppLockGateState extends State<AppLockGate> {
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    if (!_locked) {
-      return const MainScreen();
-    }
+    if (!_locked) return const MainScreen();
 
     return Scaffold(
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(28),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 360),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
-                    Icons.lock_outline,
-                    size: 64,
-                    color: AppTheme.accentBlue,
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 112,
+                        height: 112,
+                        decoration: const BoxDecoration(
+                          gradient: AppTheme.heroGradient,
+                          shape: BoxShape.circle,
+                          boxShadow: AppTheme.glowShadow,
+                        ),
+                        child: const Icon(
+                          Icons.medication_rounded,
+                          size: 54,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: AppTheme.surface,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.background,
+                              width: 3,
+                            ),
+                            boxShadow: AppTheme.softShadow,
+                          ),
+                          child: const Icon(
+                            Icons.lock_rounded,
+                            size: 20,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
-
+                  const SizedBox(height: 30),
                   const Text(
-                    'Приложение заблокировано',
+                    'Таблеточница',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.textPrimary,
+                      letterSpacing: -0.8,
                     ),
                   ),
-
-                  const SizedBox(height: 12),
-
+                  const SizedBox(height: 8),
                   const Text(
-                    'Введите PIN-код для продолжения',
+                    'Введите PIN-код, чтобы продолжить',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,
-                      color: Colors.black54,
+                      color: AppTheme.textSecondary,
                     ),
                   ),
-
-                  const SizedBox(height: 28),
-
+                  const SizedBox(height: 32),
                   TextField(
                     controller: _pinController,
                     autofocus: true,
@@ -154,38 +176,48 @@ class _AppLockGateState extends State<AppLockGate> {
                     maxLength: 6,
                     textAlign: TextAlign.center,
                     onSubmitted: (_) => _unlock(),
+                    style: const TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 10,
+                      color: AppTheme.textPrimary,
+                    ),
                     decoration: InputDecoration(
-                      labelText: 'PIN-код',
+                      hintText: 'PIN-код',
+                      hintStyle: const TextStyle(
+                        fontSize: 16,
+                        letterSpacing: 0,
+                        fontWeight: FontWeight.w500,
+                      ),
                       counterText: '',
                       errorText: _error,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 20),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _checking ? null : _unlock,
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppTheme.accentBlue,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
+                  FilledButton(
+                    onPressed: _checking ? null : _unlock,
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(56),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      child: _checking
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text('Разблокировать'),
+                    ),
+                    child: _checking
+                        ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                        : const Text(
+                      'Разблокировать',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],

@@ -4,9 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/enums.dart';
 import '../../providers/add_medication_provider.dart';
-import '../../providers/today_providers.dart';
 import '../../providers/calendar_providers.dart';
 import '../../providers/medications_providers.dart';
+import '../../providers/today_providers.dart';
+import '../../widgets/app_widgets.dart';
 
 class AddMedicationScreen extends ConsumerStatefulWidget {
   const AddMedicationScreen({super.key});
@@ -73,13 +74,15 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
             : null,
       );
 
-      ref.invalidate(todayIntakesProvider);
-      ref.invalidate(monthIntakesProvider); // Сброс кэша календаря
-      ref.invalidate(medicationsProvider);  // Сброс кэша списка лекарств
-
       if (mounted) {
         Navigator.of(context).pop();
       }
+
+      // Инвалидация — ПОСЛЕ закрытия экрана, чтобы не пересобирать
+      // виджет, который уже уходит с экрана
+      ref.invalidate(todayIntakesProvider);
+      ref.invalidate(monthIntakesProvider);
+      ref.invalidate(medicationsProvider);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -100,183 +103,196 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
-            // Название
-            const _Label('Название'),
-            TextField(
-              controller: _nameController,
-              decoration: _inputDecoration('Например, Аспирин'),
-            ),
-            const SizedBox(height: 16),
-
-            // Дозировка
-            const _Label('Дозировка'),
-            TextField(
-              controller: _dosageController,
-              decoration: _inputDecoration('500 мг'),
-            ),
-            const SizedBox(height: 16),
-
-            // Форма выпуска
-            const _Label('Форма выпуска'),
-            DropdownButtonFormField<MedicationForm>(
-              initialValue: _form,
-              decoration: _inputDecoration(null),
-              items: MedicationForm.values.map((f) {
-                return DropdownMenuItem(
-                  value: f,
-                  child: Text(_formLabel(f)),
-                );
-              }).toList(),
-              onChanged: (v) => setState(() => _form = v!),
-            ),
-            const SizedBox(height: 16),
-
-            // Времена приёма
-            const _Label('Время приёма'),
-            ..._times.asMap().entries.map((e) => _TimeRow(
-              minutes: e.value,
-              onChanged: (v) => setState(() => _times[e.key] = v),
-              onDelete: _times.length > 1
-                  ? () => setState(() => _times.removeAt(e.key))
-                  : null,
-            )),
-            TextButton.icon(
-              onPressed: () => setState(() => _times.add(480)),
-              icon: const Icon(Icons.add),
-              label: const Text('Добавить время'),
-            ),
-            const SizedBox(height: 16),
-
-            // Периодичность
-            const _Label('Периодичность'),
-            DropdownButtonFormField<SchedulePeriodicity>(
-              initialValue: _periodicity,
-              decoration: _inputDecoration(null),
-              items: SchedulePeriodicity.values.map((p) {
-                return DropdownMenuItem(
-                  value: p,
-                  child: Text(_periodicityLabel(p)),
-                );
-              }).toList(),
-              onChanged: (v) => setState(() => _periodicity = v!),
-            ),
-
-            // Дни недели (если specificDaysOfWeek)
-            if (_periodicity == SchedulePeriodicity.specificDaysOfWeek) ...[
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 6,
-                children: List.generate(7, (i) {
-                  final day = i + 1;
-                  final selected = _weekdays.contains(day);
-                  return FilterChip(
-                    label: Text(_weekdayLabel(day)),
-                    selected: selected,
-                    onSelected: (v) {
-                      setState(() {
-                        if (v) {
-                          _weekdays.add(day);
-                        } else {
-                          _weekdays.remove(day);
-                        }
-                      });
-                    },
-                  );
-                }),
-              ),
-            ],
-            const SizedBox(height: 16),
-
-            // Даты
-            Row(
+            // ── Лекарство ───────────────────────────────────
+            _SectionCard(
+              icon: Icons.medication_rounded,
+              title: 'Лекарство',
               children: [
-                Expanded(
-                  child: _DateField(
-                    label: 'Дата начала',
-                    date: _startDate,
-                    onPick: (d) => setState(() => _startDate = d),
+                const _FieldLabel('Название'),
+                TextField(
+                  controller: _nameController,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    hintText: 'Например, Аспирин',
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _DateField(
-                    label: 'Дата окончания',
-                    date: _endDate,
-                    onPick: (d) => setState(() => _endDate = d),
-                    onClear: _endDate == null
-                        ? null
-                        : () => setState(() => _endDate = null),
+                const SizedBox(height: 14),
+                const _FieldLabel('Дозировка'),
+                TextField(
+                  controller: _dosageController,
+                  decoration: const InputDecoration(hintText: '500 мг'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ── Форма выпуска ───────────────────────────────
+            _SectionCard(
+              icon: Icons.category_rounded,
+              title: 'Форма выпуска',
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: MedicationForm.values.map((f) {
+                    final selected = f == _form;
+                    return ChoiceChip(
+                      showCheckmark: false,
+                      avatar: Icon(
+                        FormStyle.icon(f),
+                        size: 18,
+                        color: selected
+                            ? AppTheme.primaryDark
+                            : FormStyle.color(f),
+                      ),
+                      label: Text(FormStyle.label(f)),
+                      selected: selected,
+                      side: _chipSide(selected),
+                      onSelected: (_) => setState(() => _form = f),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ── Расписание ──────────────────────────────────
+            _SectionCard(
+              icon: Icons.alarm_rounded,
+              title: 'Расписание',
+              children: [
+                const _FieldLabel('Время приёма'),
+                ..._times.asMap().entries.map((e) => _TimeRow(
+                      minutes: e.value,
+                      onChanged: (v) => setState(() => _times[e.key] = v),
+                      onDelete: _times.length > 1
+                          ? () => setState(() => _times.removeAt(e.key))
+                          : null,
+                    )),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: () => setState(() => _times.add(480)),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('Добавить время'),
                   ),
+                ),
+                const SizedBox(height: 10),
+                const _FieldLabel('Периодичность'),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: SchedulePeriodicity.values.map((p) {
+                    final selected = p == _periodicity;
+                    return ChoiceChip(
+                      showCheckmark: false,
+                      label: Text(_periodicityLabel(p)),
+                      selected: selected,
+                      side: _chipSide(selected),
+                      onSelected: (_) => setState(() => _periodicity = p),
+                    );
+                  }).toList(),
+                ),
+
+                // Дни недели (если specificDaysOfWeek)
+                if (_periodicity == SchedulePeriodicity.specificDaysOfWeek) ...[
+                  const SizedBox(height: 14),
+                  const _FieldLabel('Дни недели'),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: List.generate(7, (i) {
+                      final day = i + 1;
+                      final selected = _weekdays.contains(day);
+                      return FilterChip(
+                        showCheckmark: false,
+                        label: Text(_weekdayLabel(day)),
+                        selected: selected,
+                        side: _chipSide(selected),
+                        onSelected: (v) {
+                          setState(() {
+                            if (v) {
+                              _weekdays.add(day);
+                            } else {
+                              _weekdays.remove(day);
+                            }
+                          });
+                        },
+                      );
+                    }),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // ── Период ──────────────────────────────────────
+            _SectionCard(
+              icon: Icons.date_range_rounded,
+              title: 'Период приёма',
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _DateField(
+                        label: 'Начало',
+                        date: _startDate,
+                        onPick: (d) => setState(() => _startDate = d),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _DateField(
+                        label: 'Окончание',
+                        date: _endDate,
+                        onPick: (d) => setState(() => _endDate = d),
+                        onClear: _endDate == null
+                            ? null
+                            : () => setState(() => _endDate = null),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 24),
 
-            // Кнопка
-            SizedBox(
-              height: 52,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _save,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentBlue,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: _saving
-                    ? const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-                    : const Text(
-                  'Добавить в расписание',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            // ── Кнопка ──────────────────────────────────────
+            FilledButton(
+              onPressed: _saving ? null : _save,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
                 ),
               ),
+              child: _saving
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Text(
+                      'Добавить в расписание',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
 
-  InputDecoration _inputDecoration(String? hint) {
-    return InputDecoration(
-      hintText: hint,
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    );
-  }
-
-  String _formLabel(MedicationForm f) {
-    switch (f) {
-      case MedicationForm.tablet:
-        return 'Таблетка';
-      case MedicationForm.capsule:
-        return 'Капсула';
-      case MedicationForm.syrup:
-        return 'Сироп';
-      case MedicationForm.injection:
-        return 'Инъекция';
-      case MedicationForm.drops:
-        return 'Капли';
-      case MedicationForm.other:
-        return 'Другое';
-    }
-  }
+  BorderSide _chipSide(bool selected) => BorderSide(
+        color: selected ? AppTheme.primary : AppTheme.outline,
+        width: selected ? 1.4 : 1,
+      );
 
   String _periodicityLabel(SchedulePeriodicity p) {
     switch (p) {
@@ -297,20 +313,61 @@ class _AddMedicationScreenState extends ConsumerState<AddMedicationScreen> {
 
 // ─── Вспомогательные виджеты ───────────────────────────────
 
-class _Label extends StatelessWidget {
+class _SectionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final List<Widget> children;
+
+  const _SectionCard({
+    required this.icon,
+    required this.title,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SoftCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              IconBadge(icon: icon, size: 34),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textPrimary,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
   final String text;
-  const _Label(this.text);
+  const _FieldLabel(this.text);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, left: 4),
+      padding: const EdgeInsets.only(bottom: 8, left: 2),
       child: Text(
         text,
         style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w700,
+          color: AppTheme.textSecondary,
         ),
       ),
     );
@@ -338,27 +395,61 @@ class _TimeRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () async {
-                final picked = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay(
-                    hour: minutes ~/ 60,
-                    minute: minutes % 60,
+            child: Material(
+              color: AppTheme.primarySoft,
+              borderRadius: BorderRadius.circular(16),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay(
+                      hour: minutes ~/ 60,
+                      minute: minutes % 60,
+                    ),
+                  );
+                  if (picked != null) {
+                    onChanged(picked.hour * 60 + picked.minute);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
                   ),
-                );
-                if (picked != null) {
-                  onChanged(picked.hour * 60 + picked.minute);
-                }
-              },
-              icon: const Icon(Icons.access_time),
-              label: Text('$h:$m'),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule_rounded,
+                        color: AppTheme.primary,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        '$h:$m',
+                        style: const TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.primaryDark,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.edit_outlined,
+                        size: 18,
+                        color: AppTheme.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
           if (onDelete != null)
             IconButton(
               onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: const Icon(Icons.remove_circle_outline_rounded),
+              color: AppTheme.danger,
             ),
         ],
       ),
@@ -379,57 +470,71 @@ class _DateField extends StatelessWidget {
     this.onClear,
   });
 
+  String _fmt(DateTime d) {
+    final dd = d.day.toString().padLeft(2, '0');
+    final mm = d.month.toString().padLeft(2, '0');
+    return '$dd.$mm.${d.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 6, left: 4),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        InkWell(
-          onTap: () async {
-            final picked = await showDatePicker(
-              context: context,
-              initialDate: date ?? DateTime.now(),
-              firstDate: DateTime(2020),
-              lastDate: DateTime(2100),
-            );
-            if (picked != null) onPick(picked);
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    date == null
-                        ? 'Выбрать дату'
-                        : '${date!.day}.${date!.month}.${date!.year}',
-                    style: TextStyle(
-                      color: date == null ? Colors.black54 : Colors.black87,
+        _FieldLabel(label),
+        Material(
+          color: AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusS),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppTheme.radiusS),
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: date ?? DateTime.now(),
+                firstDate: DateTime(2020),
+                lastDate: DateTime(2100),
+              );
+              if (picked != null) onPick(picked);
+            },
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                border: Border.all(color: AppTheme.outline),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.calendar_today_rounded,
+                    size: 17,
+                    color: AppTheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      date == null ? 'Бессрочно' : _fmt(date!),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
+                        color: date == null
+                            ? AppTheme.textSecondary
+                            : AppTheme.textPrimary,
+                      ),
                     ),
                   ),
-                ),
-                if (onClear != null)
-                  GestureDetector(
-                    onTap: onClear,
-                    child: const Icon(Icons.close, size: 18),
-                  ),
-              ],
+                  if (onClear != null)
+                    GestureDetector(
+                      onTap: onClear,
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../domain/entities/enums.dart';
+import '../../../providers/calendar_providers.dart';
 import '../../../providers/repository_providers.dart';
 import '../../../providers/today_providers.dart';
-import '../../../providers/calendar_providers.dart';
+import '../../../widgets/app_widgets.dart';
 
 class IntakeCard extends ConsumerWidget {
   final TodayIntake item;
@@ -14,58 +15,13 @@ class IntakeCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.cardWhite,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          // Иконка формы
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: _iconColor(item.medication.form).withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _iconForForm(item.medication.form),
-              color: _iconColor(item.medication.form),
-              size: 22,
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          // Название + время
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.dosage == null
-                      ? item.medicationName
-                      : '${item.medicationName} ${item.dosage}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatTime(item.plannedAt),
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-              ],
-            ),
-          ),
-
-          // Кнопка / статус
-          _buildStatusOrButton(context, ref),
-        ],
-      ),
+    return IntakeTile(
+      form: item.medication.form,
+      title: item.dosage == null
+          ? item.medicationName
+          : '${item.medicationName} ${item.dosage}',
+      time: _formatTime(item.plannedAt),
+      trailing: _buildStatusOrButton(context, ref),
     );
   }
 
@@ -74,23 +30,14 @@ class IntakeCard extends ConsumerWidget {
       case IntakeStatus.taken:
         return GestureDetector(
           onTap: () => _showUndoDialog(context, ref),
-          child: const _StatusBadge(
-            text: 'Принято',
-            color: AppTheme.statusTaken,
-          ),
+          child: StatusPill.of(IntakeStatus.taken),
         );
       case IntakeStatus.skipped:
-        return const _StatusBadge(
-          text: 'Пропущено',
-          color: AppTheme.statusSkipped,
-        );
+        return StatusPill.of(IntakeStatus.skipped);
       case IntakeStatus.postponed:
-        return const _StatusBadge(
-          text: 'Отложено',
-          color: AppTheme.statusPostponed,
-        );
+        return StatusPill.of(IntakeStatus.postponed);
       case IntakeStatus.pending:
-        return ElevatedButton(
+        return FilledButton.icon(
           onPressed: () async {
             final repo = ref.read(intakeRepositoryProvider);
             await repo.markTaken(item.intake.id!, DateTime.now());
@@ -116,15 +63,19 @@ class IntakeCard extends ConsumerWidget {
               );
             }
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.statusTaken,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+          icon: const Icon(Icons.check_rounded, size: 18),
+          label: const Text('Принял'),
+          style: FilledButton.styleFrom(
+            minimumSize: const Size(0, 40),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            textStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13),
+            ),
           ),
-          child: const Text('Принял', style: TextStyle(fontSize: 14)),
         );
     }
   }
@@ -141,8 +92,9 @@ class IntakeCard extends ConsumerWidget {
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Нет'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.danger),
             child: const Text('Да, отменить'),
           ),
         ],
@@ -157,69 +109,9 @@ class IntakeCard extends ConsumerWidget {
     }
   }
 
-  IconData _iconForForm(MedicationForm form) {
-    switch (form) {
-      case MedicationForm.tablet:
-        return Icons.medication;
-      case MedicationForm.capsule:
-        return Icons.medication_liquid;
-      case MedicationForm.syrup:
-        return Icons.sanitizer;
-      case MedicationForm.injection:
-        return Icons.vaccines;
-      case MedicationForm.drops:
-        return Icons.water_drop;
-      case MedicationForm.other:
-        return Icons.medical_services;
-    }
-  }
-
-  Color _iconColor(MedicationForm form) {
-    switch (form) {
-      case MedicationForm.tablet:
-        return const Color(0xFF3B82F6);
-      case MedicationForm.capsule:
-        return const Color(0xFFEF4444);
-      case MedicationForm.syrup:
-        return const Color(0xFFF59E0B);
-      case MedicationForm.injection:
-        return const Color(0xFF8B5CF6);
-      case MedicationForm.drops:
-        return const Color(0xFF10B981);
-      case MedicationForm.other:
-        return const Color(0xFF6B7280);
-    }
-  }
-
   String _formatTime(DateTime dt) {
     final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');
     return '$h:$m';
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  final String text;
-  final Color color;
-
-  const _StatusBadge({required this.text, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 13,
-        ),
-      ),
-    );
   }
 }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/enums.dart';
+import '../../../domain/entities/medication.dart';
 import '../../providers/medications_providers.dart';
+import '../../widgets/app_widgets.dart';
 import '../add_medication/add_medication_screen.dart';
 
 class MedicationsScreen extends ConsumerWidget {
@@ -18,33 +19,38 @@ class MedicationsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Лекарства'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const AddMedicationScreen(),
-                ),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: IconButton.filledTonal(
+              style: IconButton.styleFrom(
+                backgroundColor: AppTheme.primarySoft,
+                foregroundColor: AppTheme.primaryDark,
+              ),
+              icon: const Icon(Icons.add_rounded),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AddMedicationScreen(),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
       body: medsAsync.when(
         data: (meds) {
           if (meds.isEmpty) {
-            return const Center(
-              child: Text(
-                'Пока нет лекарств.\nНажмите «+», чтобы добавить.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
+            return const EmptyState(
+              icon: Icons.medication_rounded,
+              title: 'Пока нет лекарств',
+              message: 'Нажмите «+», чтобы добавить первое\nлекарство и расписание.',
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
             itemCount: meds.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (_, i) => _MedicationTile(medication: meds[i]),
           );
         },
@@ -56,32 +62,19 @@ class MedicationsScreen extends ConsumerWidget {
 }
 
 class _MedicationTile extends ConsumerWidget {
-  final dynamic medication;
+  final Medication medication;
   const _MedicationTile({required this.medication});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
+    final color = FormStyle.color(medication.form);
+
+    return SoftCard(
+      padding: const EdgeInsets.fromLTRB(14, 14, 6, 14),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppTheme.accentBlue.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              _iconForForm(medication.form),
-              color: AppTheme.accentBlue,
-            ),
-          ),
-          const SizedBox(width: 12),
+          FormBadge(form: medication.form, size: 52),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,21 +83,56 @@ class _MedicationTile extends ConsumerWidget {
                   medication.dosage == null
                       ? medication.name
                       : '${medication.name} ${medication.dosage}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                    letterSpacing: -0.2,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  _formatDateRange(medication.startDate, medication.endDate),
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        FormStyle.label(medication.form),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      _formatDateRange(medication.startDate, medication.endDate),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline, color: Colors.red),
+            icon: const Icon(Icons.delete_outline_rounded),
+            color: AppTheme.danger,
+            tooltip: 'Удалить',
             onPressed: () => _confirmDelete(context, ref),
           ),
         ],
@@ -123,9 +151,10 @@ class _MedicationTile extends ConsumerWidget {
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Отмена'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
+            style: FilledButton.styleFrom(backgroundColor: AppTheme.danger),
+            child: const Text('Удалить'),
           ),
         ],
       ),
@@ -135,25 +164,13 @@ class _MedicationTile extends ConsumerWidget {
     }
   }
 
-  IconData _iconForForm(MedicationForm form) {
-    switch (form) {
-      case MedicationForm.tablet:
-        return Icons.medication;
-      case MedicationForm.capsule:
-        return Icons.medication_liquid;
-      case MedicationForm.syrup:
-        return Icons.sanitizer;
-      case MedicationForm.injection:
-        return Icons.vaccines;
-      case MedicationForm.drops:
-        return Icons.water_drop;
-      case MedicationForm.other:
-        return Icons.medical_services;
-    }
-  }
-
   String _formatDateRange(DateTime start, DateTime? end) {
-    String fmt(DateTime d) => '${d.day}.${d.month}.${d.year}';
+    String fmt(DateTime d) {
+      final dd = d.day.toString().padLeft(2, '0');
+      final mm = d.month.toString().padLeft(2, '0');
+      return '$dd.$mm.${d.year}';
+    }
+
     if (end == null) return 'с ${fmt(start)}';
     return '${fmt(start)} — ${fmt(end)}';
   }

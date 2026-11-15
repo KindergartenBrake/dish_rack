@@ -5,7 +5,7 @@ import '../../domain/entities/intake.dart';
 import '../../domain/entities/medication.dart';
 import 'repository_providers.dart';
 
-// Модель, объединяющая приём и лекарство (аналогично TodayIntake)
+// Модель, объединяющая приём и лекарство.
 class CalendarIntake {
   final Intake intake;
   final Medication medication;
@@ -19,10 +19,11 @@ class CalendarIntake {
   MedicationForm get form => medication.form;
 }
 
-// Провайдер, который загружает приёмы на конкретный месяц (семейство провайдеров)
-final monthIntakesProvider = FutureProvider.family<List<CalendarIntake>, DateTime>((ref, month) async {
+// Загружает приёмы и соответствующие лекарства для указанного месяца.
+final monthIntakesProvider =
+FutureProvider.family<List<CalendarIntake>, DateTime>((ref, month) async {
   final start = DateTime(month.year, month.month, 1);
-  final end = DateTime(month.year, month.month + 1, 1); // Первое число следующего месяца
+  final end = DateTime(month.year, month.month + 1, 1);
 
   final intakeRepo = ref.watch(intakeRepositoryProvider);
   final medRepo = ref.watch(medicationRepositoryProvider);

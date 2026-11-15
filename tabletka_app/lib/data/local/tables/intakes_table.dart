@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import '../../../../domain/entities/enums.dart';
+import '../../../domain/entities/enums.dart';
 import 'medications_table.dart';
 import 'schedules_table.dart';
 
